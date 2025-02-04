@@ -367,15 +367,55 @@ export default function Multistep() {
   const [form, setForm] = React.useState({title:"", desc:"", country:"", state:"", pincode:"", landmark:"", city:"", otherInfo:"", website:""});
 
   const handleOnSubmit = async () => {
-    const finalForm = {title:form.title, desc:form.desc, address:(form.landmark+", "+form.city+", "+form.state+", "+form.country+", "+form.pincode), otherInfo:form.otherInfo, website:form.website, skill:skill, experience:exp}
-    console.log(finalForm)
-    toast({
-      title: 'Account created.',
-      description: "We've created your account for you.",
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    })
+    const {title, desc, otherInfo, website, country, state, pincode, landmark, city} = form;
+    let headersList = {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+     }
+     
+     let bodyContent = JSON.stringify({
+       "title": title,
+       "desc": desc,
+       "otherInfo": otherInfo,
+       "website": website,
+       "skill": skill,
+       "exp":exp,
+       "address": {
+        "country":country,
+        "state":state,
+        "pincode":pincode,
+        "landmark":landmark,
+        "city":city,
+       }
+     });
+     
+     let response = await fetch("http://localhost:8080/recruiter/addJobPost", { 
+       method: "POST",
+       body: bodyContent,
+       headers: headersList,
+       credentials: "include"
+     });
+     
+     let data = await response.json();
+     console.log(data, bodyContent)
+     if (data.success) {
+      toast({
+        title: 'JobPost',
+        description: data.message,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      })
+    } else {
+      toast({
+        title: 'JobPost',
+        description: data.message,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    }
+    
   }
   return (
     <>

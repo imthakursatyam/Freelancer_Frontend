@@ -466,45 +466,40 @@ export default function register() {
    const dispatch = useDispatch();
 
    const handleOnSubmitFreelancer = async (e) => {
-     e.preventDefault();   
-     console.log(form);
-     dispatch(setLogin({val:true}));
-     dispatch(setCurrRole({val:"FREELANCER"}));
-     Router.push("/");
-     return;
+     e.preventDefault();    
      let headersList = {
-      "Accept": "*/*",
+      "Accept": "application/json",
       "Content-Type": "application/json"
      }
-     
      let bodyContent = JSON.stringify({
        "email":form.email,
        "password":form.password,
-       "role":""
+       "role":"FREELANCER"
      });
      
-     let response = await fetch("localhost:8080/login", { 
+     let response = await fetch("http://localhost:8080/login", { 
        method: "POST",
        body: bodyContent,
        headers: headersList
      });
      
-     let data = await response.text();
-     console.log(data);
-     
+     let data = await response.json();
+     console.log(data)
+     console.log(data.message)
+     if (data.success) {
+      alert(data.message);
+      dispatch(setLogin({val:true}));
+      dispatch(setCurrRole({val:"FREELANCER"}));
+      Router.push("/");
+    } else {
+      alert(data.message+", Please try again");
+    }
    }
 
    const handleOnSubmitRecruiter = async (e) => {
     e.preventDefault();   
-    console.log(form);
-    dispatch(setLogin({val:true}));
-    dispatch(setCurrRole({val:"RECRUITER"}));
-    Router.push("/");
-
-     return;
-     let headersList = {
-      "Accept": "*/*",
-      "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+    let headersList = {
+      "Accept": "application/json",
       "Content-Type": "application/json"
      }
      
@@ -514,14 +509,21 @@ export default function register() {
        "role":"RECRUITER"
      });
      
-     let response = await fetch("localhost:8080/login", { 
+     let response = await fetch("http://localhost:8080/login", { 
        method: "POST",
        body: bodyContent,
        headers: headersList
      });
      
-     let data = await response.text();
-     console.log(data);
+     let data = await response.json();
+     if (data.success) {
+      alert(data.message);
+      dispatch(setLogin({val:true}));
+      dispatch(setCurrRole({val:"RECRUITER"}));
+      Router.push("/");
+    } else {
+      alert(data.message+", Please try again");
+    }
      
    }
    const handleOnChange = (e) => {

@@ -226,7 +226,7 @@ const DesktopNav = () => {
 
 const DesktopSubNav = ({ label, href, subLabel }) => {
   return (
-    <Link href={href ?? '#'}>
+    <Link href={href}>
     <Box   
       role={'group'}
       display={'block'}
@@ -344,21 +344,25 @@ const NAV_ITEMS = [
     label: 'Find Work',
     children: [
       {
-        label: 'Job Board',
-        subLabel: 'Find your dream design job',
-        href: '#',
+        label: 'Explore',
+        subLabel: 'Find your dream job from our top recruiters',
+        href: '/freelancer/exploreJobs',
       },
       {
-        label: 'Open Projects',
-        subLabel: 'An exclusive list for contract work',
-        href: '#',
+        label: 'Applied Jobposts',
+        subLabel: 'Manage your applied jobposts',
+        href: '/freelancer/appliedJobpost',
+      },
+      {
+        label: 'Search Job',
+        subLabel: 'Search a specific job',
+        href: '/freelancer/searchJob',
       },
     ],
     role: "FREELANCER"
   },
   {
     label: 'Hire a Freelaner',
-    href: '#',
     children: [
       {
         label: 'Find a Freelancer',

@@ -31,63 +31,140 @@ import {
 
 import { useToast } from '@chakra-ui/react'
 
-const Form1 = () => {
+
+export async function getServerSideProps(context) {
+    
+    
+    // Assuming you have an API that fetches the job post by id
+    //const res = await fetch(`https://your-backend-api.com/jobpost/${id}`);
+    const jobPost = {
+      "id": "603d2149e9b1a1c92c7a8a5b",
+      "title": "Software Developer",
+      "desc": "We are looking for a talented Software Developer to join our dynamic team. You will be responsible for developing cutting-edge software solutions.",
+      "skills": ["Java", "Spring Boot", "MongoDB", "Git", "Docker"],
+      "exp": ["2-3 years", "Familiarity with Agile methodologies"],
+      "address": {
+        "landmark": "Near Central Park",
+        "state": "California",
+        "city": "San Francisco",
+        "pincode": "94107",
+        "country": "India"
+      },
+      "otherInfo": "Competitive salary and benefits.",
+      "website": "https://www.examplecompany.com",
+      "date": "2025-01-30"
+    };
+  
+    return {
+      props: {
+        jobPost,
+      },
+    };
+}
+const Form1 = ({skill, setSkill, exp, setExp, form, setForm}) => {
   const [show, setShow] = React.useState(false)
+  const [expInput, setExpInput] = React.useState("");
+  const [skillInput, setSkillInput] = React.useState("");
+  const [title, setTitleInput] = React.useState("");
+  const [desc, setDesInput] = React.useState("");
+
+  const expOnChange = (e) => {
+    setExpInput(e.target.value);
+  }
+  const skillOnChange = (e) => {
+    setSkillInput(e.target.value);
+  }
+
+  const appendExp = () => {
+    setExp((prev)=> [...prev, expInput]);
+    setExpInput('');
+  }
+  const appendSkill = () => {
+    setSkill((prev)=> [...prev, skillInput]);
+    setSkillInput('');
+  }
   const handleClick = () => setShow(!show)
   return (
     <>
-      <Heading w="100%" textAlign={'center'} fontWeight="normal" mb="2%">
-        User Registration
+     <Heading w="100%" size={"xl"} textAlign={'center'} fontWeight="bold" mb={"5%"}>
+       Job Info
       </Heading>
       <Flex>
-        <FormControl mr="5%">
-          <FormLabel htmlFor="first-name" fontWeight={'normal'}>
-            First name
+        <FormControl w={"50%"} mr="5%">
+          <FormLabel fontWeight={'bold'}>
+            Title
           </FormLabel>
-          <Input id="first-name" placeholder="First name" />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel htmlFor="last-name" fontWeight={'normal'}>
-            Last name
-          </FormLabel>
-          <Input id="last-name" placeholder="First name" />
+          <Input bg="gray.50"
+              _dark={{
+                bg: 'gray.800',
+              }}
+              color="gray.500"
+              rounded="md" value={form.title} onChange={(e) => setForm({...form, ["title"]:e.target.value})}  placeholder="Frontend Developer" />
         </FormControl>
       </Flex>
       <FormControl mt="2%">
-        <FormLabel htmlFor="email" fontWeight={'normal'}>
-          Email address
+        <FormLabel  fontWeight={'bold'}>
+          Description
         </FormLabel>
-        <Input id="email" type="email" />
-        <FormHelperText>We&apos;ll never share your email.</FormHelperText>
+        <Textarea value={form.desc} onChange={(e) => setForm({...form, ["desc"]:e.target.value})}  bg="gray.50"
+              _dark={{
+                bg: 'gray.800',
+              }}
+              color="gray.500"
+              rounded="md"   type="text" />
       </FormControl>
 
       <FormControl>
-        <FormLabel htmlFor="password" fontWeight={'normal'} mt="2%">
-          Password
+        <FormLabel  fontWeight={'bold'} mt="2%">
+          Skills
         </FormLabel>
-        <InputGroup size="md">
-          <Input
-            pr="4.5rem"
-            type={show ? 'text' : 'password'}
-            placeholder="Enter password"
-          />
-          <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={handleClick}>
-              {show ? 'Hide' : 'Show'}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
+        <Flex my={2}>
+          <Input bg="gray.50"
+              _dark={{
+                bg: 'gray.800',
+              }}
+              color="gray.500"
+              rounded="md"  value={skillInput} onChange={(e)=> skillOnChange(e)} w={"30%"} mr={2} type='text'/>
+          <Button color={"white"} bg={"green.400"} mr={2} onClick={appendSkill}>Add</Button>
+          <Button color={"white"} bg={"green.400"} onClick={() => setSkill([])}>Reset</Button>
+        </Flex>
+        <Textarea bg="gray.50"
+              _dark={{
+                bg: 'gray.800',
+              }}
+              color="gray.500"
+              rounded="md" value={skill.map((e) => e)} disabled id="desc" type="text" />
+      </FormControl>
+      <FormControl>
+      <FormLabel fontWeight={'bold'} mt="2%">
+          Experience
+        </FormLabel>
+        <Flex my={2}>
+          <Input bg="gray.50"
+              _dark={{
+                bg: 'gray.800',
+              }}
+              color="gray.500"
+              rounded="md" value={expInput} onChange={(e)=> expOnChange(e)} w={"30%"} mr={2} type='text'/>
+          <Button color={"white"} bg={"green.400"} mr={2} onClick={appendExp}>Add</Button>
+          <Button color={"white"} bg={"green.400"} onClick={() => setExp([])}>Reset</Button>
+        </Flex>
+        <Textarea bg="gray.50"
+              _dark={{
+                bg: 'gray.800',
+              }}
+              color="gray.500"
+              rounded="md" value={exp.map((e) => e)} disabled id="desc" type="text" />
       </FormControl>
     </>
   )
 }
 
-const Form2 = () => {
+const Form2 = ({form, setForm}) => {
   return (
     <>
-      <Heading w="100%" textAlign={'center'} fontWeight="normal" mb="2%">
-        User Details
+      <Heading w="100%" size={"xl"} textAlign={'center'} fontWeight="bold" mb={"5%"}>
+        Location Info
       </Heading>
       <FormControl as={GridItem} colSpan={[6, 3]}>
         <FormLabel
@@ -109,16 +186,19 @@ const Form2 = () => {
           shadow="sm"
           size="sm"
           w="full"
+          value={form.country}
+          onChange={(e) => setForm({...form, ["country"]:e.target.value})}
           rounded="md">
           <option>United States</option>
           <option>Canada</option>
           <option>Mexico</option>
+          <option>India</option>
         </Select>
       </FormControl>
 
       <FormControl as={GridItem} colSpan={6}>
         <FormLabel
-          htmlFor="street_address"
+          htmlFor="landmark"
           fontSize="sm"
           fontWeight="md"
           color="gray.700"
@@ -126,18 +206,20 @@ const Form2 = () => {
             color: 'gray.50',
           }}
           mt="2%">
-          Street address
+          Landmark
         </FormLabel>
         <Input
           type="text"
-          name="street_address"
-          id="street_address"
-          autoComplete="street-address"
+          name="landmark"
+          id="landmark"
+          autoComplete="landmark"
           focusBorderColor="brand.400"
           shadow="sm"
           size="sm"
           w="full"
           rounded="md"
+          value={form.landmark}
+          onChange={(e) => setForm({...form, ["landmark"]:e.target.value})}
         />
       </FormControl>
 
@@ -163,6 +245,8 @@ const Form2 = () => {
           size="sm"
           w="full"
           rounded="md"
+          onChange={(e) => setForm({...form, ["city"]:e.target.value})}
+          value={form.city}
         />
       </FormControl>
 
@@ -188,12 +272,14 @@ const Form2 = () => {
           size="sm"
           w="full"
           rounded="md"
+          value={form.state}
+          onChange={(e) => setForm({...form, ["state"]:e.target.value})}
         />
       </FormControl>
 
       <FormControl as={GridItem} colSpan={[6, 3, null, 2]}>
         <FormLabel
-          htmlFor="postal_code"
+          htmlFor="pincode"
           fontSize="sm"
           fontWeight="md"
           color="gray.700"
@@ -201,28 +287,30 @@ const Form2 = () => {
             color: 'gray.50',
           }}
           mt="2%">
-          ZIP / Postal
+          Pincode
         </FormLabel>
         <Input
-          type="text"
-          name="postal_code"
-          id="postal_code"
-          autoComplete="postal-code"
+          type="number"
+          name="pincode"
+          id="pincode"
+          autoComplete="pincode"
           focusBorderColor="brand.400"
           shadow="sm"
           size="sm"
           w="full"
           rounded="md"
+          onChange={(e) => setForm({...form, ["pincode"]:e.target.value})}
+          value={form.pincode}
         />
       </FormControl>
     </>
   )
 }
 
-const Form3 = () => {
+const Form3 = ({form, setForm}) => {
   return (
     <>
-      <Heading w="100%" textAlign={'center'} fontWeight="normal">
+      <Heading w="100%" size={"xl"} textAlign={'center'} fontWeight="bold" mb={"5%"}>
         Social Handles
       </Heading>
       <SimpleGrid columns={1} spacing={6}>
@@ -243,7 +331,7 @@ const Form3 = () => {
                 bg: 'gray.800',
               }}
               color="gray.500"
-              rounded="md">
+              rounded="md" >
               http://
             </InputLeftAddon>
             <Input
@@ -251,31 +339,36 @@ const Form3 = () => {
               placeholder="www.example.com"
               focusBorderColor="brand.400"
               rounded="md"
+              value={form.website}
+              onChange={(e) => setForm({...form, ["website"]:e.target.value})}
             />
           </InputGroup>
         </FormControl>
 
-        <FormControl id="email" mt={1}>
+        <FormControl id="OtherInfo" mt={1}>
           <FormLabel
             fontSize="sm"
-            fontWeight="md"
+            fontWeight="sm"
             color="gray.700"
             _dark={{
               color: 'gray.50',
             }}>
-            About
+            Other Info
           </FormLabel>
           <Textarea
-            placeholder="you@example.com"
+            placeholder="Any Info or suggestion for freelancers"
             rows={3}
             shadow="sm"
             focusBorderColor="brand.400"
             fontSize={{
               sm: 'sm',
             }}
+            type="text"
+            value={form.email}
+            onChange={(e) => setForm({...form, ["otherInfo"]:e.target.value})}
           />
           <FormHelperText>
-            Brief description for your profile. URLs are hyperlinked.
+            
           </FormHelperText>
         </FormControl>
       </SimpleGrid>
@@ -289,43 +382,52 @@ const steps = [
     { title: 'Third', description: 'Select Rooms' },
   ]
 
-export default function Multistep() {
+export default function Multistep({jobPost}) {
   const toast = useToast()
   const [step, setStep] = React.useState(1)
-  const [progress, setProgress] = React.useState(33.33)
+  const [progress, setProgress] = React.useState(33.33);
   const { activeStep } = useSteps({
     index: 1,
     count: steps.length,
-  })
+  });
+
+  const [skill, setSkill] = React.useState([]);
+  const [exp, setExp] = React.useState([]);
+  const [form, setForm] = React.useState({title:"", desc:"", country:"", state:"", pincode:"", landmark:"", city:"", otherInfo:"", website:""});
+
+  React.useEffect(()=>{
+    if (jobPost == null) return; // show an error 
+    const {title, desc, otherInfo, website, exp, skills} = jobPost;
+    const {country, state, pincode, landmark, city} = jobPost.address;
+    setExp(exp);
+    setSkill(skills);
+    setForm({title:title, desc:desc, otherInfo:otherInfo, website:website, country:country, state:state, pincode:pincode, city:city, landmark:landmark});
+  }, [])
+
+  const handleOnSubmit = async () => {
+    const finalForm = {title:form.title, desc:form.desc, address:(form.landmark+", "+form.city+", "+form.state+", "+form.country+", "+form.pincode), otherInfo:form.otherInfo, website:form.website, skill:skill, experience:exp}
+    console.log(finalForm)
+    toast({
+      title: 'Account created.',
+      description: "We've created your account for you.",
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    })
+  }
   return (
     <>
-     <Stepper mx={'auto'} my={10} maxWidth={850}  index={activeStep}>
-      {steps.map((step, index) => (
-        <Step key={index}>
-          <StepIndicator>
-            <StepStatus
-              complete={<StepIcon />}
-              incomplete={<StepNumber />}
-              active={<StepNumber />}
-            />
-          </StepIndicator>
-
-          <Box flexShrink='0'>
-            <StepTitle>{step.title}</StepTitle>
-            <StepDescription>{step.description}</StepDescription>
-          </Box>
-
-          <StepSeparator />
-        </Step>
-      ))}
-    </Stepper>
+     
       <Box
-        maxWidth={800}
-        p={6}
-        m="10px auto"
+        maxWidth={900}
+        p={10}
+        py={20}
+        m="20px auto"
+        className='bg-white rounded-md'
+        
         as="form">
-        <Progress colorScheme='green' value={progress} mb="5%" mx="5%" isAnimated></Progress>
-        {step === 1 ? <Form1 /> : step === 2 ? <Form2 /> : <Form3 />}
+     
+        {step === 1 ? <Form1 skill={skill} setSkill={setSkill} exp={exp} setExp={setExp} form={form} setForm={setForm} /> : step === 2 ? <Form2 form={form}  setForm={setForm} /> : <Form3 form={form} setForm={setForm} />}
         <ButtonGroup mt="5%" w="100%">
           <Flex w="100%" justifyContent="space-between">
             <Flex>
@@ -335,7 +437,7 @@ export default function Multistep() {
                   setProgress(progress - 33.33)
                 }}
                 isDisabled={step === 1}
-                colorScheme="teal"
+                colorScheme="green"
                 variant="solid"
                 w="7rem"
                 mr="5%">
@@ -352,7 +454,7 @@ export default function Multistep() {
                     setProgress(progress + 33.33)
                   }
                 }}
-                colorScheme="teal"
+                colorScheme="green"
                 variant="outline">
                 Next
               </Button>
@@ -362,15 +464,7 @@ export default function Multistep() {
                 w="7rem"
                 colorScheme="red"
                 variant="solid"
-                onClick={() => {
-                  toast({
-                    title: 'Account created.',
-                    description: "We've created your account for you.",
-                    status: 'success',
-                    duration: 3000,
-                    isClosable: true,
-                  })
-                }}>
+                onClick={handleOnSubmit}>
                 Submit
               </Button>
             ) : null}
