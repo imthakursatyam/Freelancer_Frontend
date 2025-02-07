@@ -28,38 +28,48 @@ import {
   Step,
   useSteps
 } from '@chakra-ui/react'
-
 import { useToast } from '@chakra-ui/react'
+import cookie from "cookie";
 
 
 export async function getServerSideProps(context) {
+
+     try {
+        const slug = context.params.slug;
+        const cookies = context.req.headers.cookie || '';
+        const parsedCookies = cookie.parse(cookies);
+        let headersList = {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "Cookie": cookies
+         }
+        let response = await fetch("http://localhost:8080/recruiter/getSpecificJobPost", { 
+          method: "POST",
+          headers: headersList,
+          credentials: "include",
+          body: JSON.stringify({"id":slug})
+        });
     
-    
+        
+        let data = await response.json();
+        if(!data.success) throw new Error("No Jobposts");
+     
+        return {
+          props: {
+            jobPost: data.jobPost,
+          },
+        };
+      } catch (error) {
+       
+        return {
+          props: {
+            jobPosts: null,
+          },
+        };
+      }
     // Assuming you have an API that fetches the job post by id
     //const res = await fetch(`https://your-backend-api.com/jobpost/${id}`);
-    const jobPost = {
-      "id": "603d2149e9b1a1c92c7a8a5b",
-      "title": "Software Developer",
-      "desc": "We are looking for a talented Software Developer to join our dynamic team. You will be responsible for developing cutting-edge software solutions.",
-      "skills": ["Java", "Spring Boot", "MongoDB", "Git", "Docker"],
-      "exp": ["2-3 years", "Familiarity with Agile methodologies"],
-      "address": {
-        "landmark": "Near Central Park",
-        "state": "California",
-        "city": "San Francisco",
-        "pincode": "94107",
-        "country": "India"
-      },
-      "otherInfo": "Competitive salary and benefits.",
-      "website": "https://www.examplecompany.com",
-      "date": "2025-01-30"
-    };
-  
-    return {
-      props: {
-        jobPost,
-      },
-    };
+   
 }
 const Form1 = ({skill, setSkill, exp, setExp, form, setForm}) => {
   const [show, setShow] = React.useState(false)
@@ -300,7 +310,7 @@ const Form2 = ({form, setForm}) => {
           w="full"
           rounded="md"
           onChange={(e) => setForm({...form, ["pincode"]:e.target.value})}
-          value={form.pincode}
+          value={parseInt(form.pincode)}
         />
       </FormControl>
     </>
@@ -364,7 +374,7 @@ const Form3 = ({form, setForm}) => {
               sm: 'sm',
             }}
             type="text"
-            value={form.email}
+            value={form.otherInfo}
             onChange={(e) => setForm({...form, ["otherInfo"]:e.target.value})}
           />
           <FormHelperText>
@@ -396,6 +406,7 @@ export default function Multistep({jobPost}) {
   const [form, setForm] = React.useState({title:"", desc:"", country:"", state:"", pincode:"", landmark:"", city:"", otherInfo:"", website:""});
 
   React.useEffect(()=>{
+    console.log(jobPost);
     if (jobPost == null) return; // show an error 
     const {title, desc, otherInfo, website, exp, skills} = jobPost;
     const {country, state, pincode, landmark, city} = jobPost.address;

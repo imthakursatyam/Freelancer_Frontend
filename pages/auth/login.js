@@ -480,7 +480,8 @@ export default function register() {
      let response = await fetch("http://localhost:8080/login", { 
        method: "POST",
        body: bodyContent,
-       headers: headersList
+       headers: headersList,
+       credentials: "include"
      });
      
      let data = await response.json();
@@ -512,7 +513,8 @@ export default function register() {
      let response = await fetch("http://localhost:8080/login", { 
        method: "POST",
        body: bodyContent,
-       headers: headersList
+       headers: headersList, 
+       credentials: "include"
      });
      
      let data = await response.json();

@@ -415,7 +415,11 @@ export default function Multistep() {
         isClosable: true,
       })
     }
-    
+
+    setForm({title:"", desc:"", country:"", state:"", pincode:"", landmark:"", city:"", otherInfo:"", website:""});
+    setExp([]);
+    setSkill([]);
+    setStep(1);
   }
   return (
     <>
