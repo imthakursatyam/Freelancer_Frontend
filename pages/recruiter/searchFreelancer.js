@@ -18,11 +18,17 @@ import {
 } from '@chakra-ui/react'
 import React from 'react';
 import { FaCheckCircle } from 'react-icons/fa'
-
+import  { useRouter } from "next/router"
 import { Input, InputGroup, InputLeftElement, Icon } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
+import cookie from "cookie";
 
- function SocialProfileSimple({profile}) {
+ function SocialProfileSimple({profile, routeToProfile}) { 
+  
+
+  const sendMail = (email) => {
+
+  }
   return (
     <Center py={6}>
       <Box
@@ -35,9 +41,7 @@ import { SearchIcon } from '@chakra-ui/icons';
         textAlign={'center'}>
         <Avatar
           size={'xl'}
-          src={
-            'https://images.unsplash.com/photo-1520810627419-35e362c5dc07?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'
-          }
+          src={profile.profileImg}
           mb={4}
           pos={'relative'}
           _after={{
@@ -53,10 +57,10 @@ import { SearchIcon } from '@chakra-ui/icons';
           }}
         />
         <Heading fontSize={'2xl'} fontFamily={'body'}>
-          {profile.firstName + " " + profile.lastName}
+          {profile.name}
         </Heading>
         <Text fontWeight={600} color={'gray.500'} mb={4}>
-          {profile.email}
+          {profile.contactMail}
         </Text>
         <Text
           textAlign={'center'}
@@ -70,7 +74,7 @@ import { SearchIcon } from '@chakra-ui/icons';
           <Wrap maxWidth={"95%"} mt={6} spacing={5} overflow={"hidden"}>
             <WrapItem display={"flex"}>
             {
-            profile.skills.map((skill, index) => {
+             profile.skills && profile.skills.map((skill, index) => {
               return <Badge key={index}
               px={2}
               py={1}
@@ -91,10 +95,12 @@ import { SearchIcon } from '@chakra-ui/icons';
             flex={1}
             fontSize={'sm'}
             rounded={'full'}
+            onClick={() => routeToProfile(profile.id)}
             >
-            Message
+            View Profile
           </Button>
           <Button
+            onClick={() => sendMail(profile.contactMail)}
             flex={1}
             fontSize={'sm'}
             rounded={'full'}
@@ -109,7 +115,7 @@ import { SearchIcon } from '@chakra-ui/icons';
             _focus={{
               bg: 'green.500',
             }}>
-            Follow
+            Message
           </Button>
         </Stack>
       </Box>
@@ -134,12 +140,79 @@ function PriceWrapper(props) {
   )
 }
 
-export default function ThreeTierPricing() {
-  const [searchTerm, setSearchTerm] = React.useState('');
 
-  const handleSearchChange = (event) => {
+export async function getServerSideProps(context) {
+    try {
+      
+    const cookies = context.req.headers.cookie || '';
+    const parsedCookies = cookie.parse(cookies);
+    let headersList = {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Cookie": cookies
+     }
+    let response = await fetch("http://localhost:8080/recruiter/getFreelancers", { 
+      method: "POST",
+      headers: headersList,
+      credentials: "include"
+    });
+
+    let data = await response.json();
+    console.log(data)
+    if(!data.success) throw new Error("No Freelancers");
+    
+    return {
+      props: {
+        freelancers: data.freelancers,
+      },
+    };
+  } catch (error) {
+   console.log(error)
+    return {
+      props: {
+        freelancers: [],
+      },
+    };
+  }
+ 
+}
+
+
+export default function ThreeTierPricing({freelancers}) {
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [isSearching, setSearching] = React.useState(false);
+  const [profiles, setProfiles] = React.useState([]);
+
+  const router = useRouter();
+  const routeToProfile = (id) => {
+    router.push("/freelancer/profile/"+id);
+  }
+  const handleSearchChange =  (event) => {
+    console.log(event.target.value)
+    if (event.target.value.length >= 3) {
+       setSearching(true);
+       handleSearch(event.target.value);
+       // is user is already typing  no need to change state
+    }
     setSearchTerm(event.target.value);
+    if (event.target.value.length <= 2) setSearching(false); 
   };
+  const handleSearch = async (query) => {
+    let headersList = {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+     }
+    let response = await fetch("http://localhost:8080/recruiter/searchFreelancer", { 
+      method: "POST",
+      body: JSON.stringify({"query": query}),
+      headers: headersList,
+      credentials: "include"
+    });
+
+    let data = await response.json();
+    if (data.success) setProfiles(data.profiles)
+  }
+
   return (
     <Box py={12}>
       <VStack spacing={2} textAlign="center">
@@ -158,7 +231,7 @@ export default function ThreeTierPricing() {
         <Input
           type="text"
           value={searchTerm}
-          onChange={handleSearchChange}
+          onChange={(e) => handleSearchChange(e)}
           placeholder="Search..."
           size="lg"
           borderRadius="md"
@@ -168,9 +241,14 @@ export default function ThreeTierPricing() {
     </Box>
       <Stack display={"flex"} align="center" py={10}>
         <Wrap spacing={10} justify="center">
-          {(freelancers).map((profile, index) => (
+        {(isSearching && profiles) && (profiles).map((profile, index) => (
+            <WrapItem key={index} >
+              <SocialProfileSimple profile={profile} routeToProfile={routeToProfile} />
+            </WrapItem>
+          ))}
+        {(freelancers && !isSearching) && (freelancers).map((profile, index) => (
             <WrapItem key={index}>
-              <SocialProfileSimple profile={profile} />
+              <SocialProfileSimple profile={profile} routeToProfile={routeToProfile} />
             </WrapItem>
           ))}
         </Wrap>
@@ -178,81 +256,135 @@ export default function ThreeTierPricing() {
     </Box>
   )
 }
-
-const freelancers = [
-    {
-      "freelancerId": "609c72ef7f53d201f1d0e12d",
-      "email": "john.doe@example.com",
-      "firstName": "John",
-      "lastName": "Doe",
-      "location": "San Francisco, CA",
-      "bio": "Experienced full-stack developer with a passion for building scalable web applications. Expert in JavaScript, React, Node.js, and MongoDB.",
-      "contactNumber": "+1 (555) 123-4567",
-      "contactEmail": "john.doe@example.com",
-      "availableForWork": true,
-      "hourlyRate": 45.0,
-      "skills": ["JavaScript", "React", "Node.js", "MongoDB"],
-      "certifications": ["Certified JavaScript Developer", "AWS Certified Solutions Architect"],
-      "languages": ["English", "Spanish"]
-    },
-    {
-      "freelancerId": "609c72ef7f53d201f1d0e12e",
-      "email": "alice.smith@example.com",
-      "firstName": "Alice",
-      "lastName": "Smith",
-      "location": "New York, NY",
-      "bio": "Creative graphic designer with 5+ years of experience in branding, UI/UX design, and print media. I turn ideas into visually stunning designs.",
-      "contactNumber": "+1 (555) 234-5678",
-      "contactEmail": "alice.smith@example.com",
-      "availableForWork": true,
-      "hourlyRate": 60.0,
-      "skills": ["Photoshop", "Illustrator", "UI/UX Design", "Branding"],
-      "certifications": ["Adobe Certified Expert", "UI/UX Design Specialist"],
-      "languages": ["English", "French"]
-    },
-    {
-      "freelancerId": "609c72ef7f53d201f1d0e12f",
-      "email": "michael.jones@example.com",
-      "firstName": "Michael",
-      "lastName": "Jones",
-      "location": "Los Angeles, CA",
-      "bio": "Experienced marketing strategist specializing in digital marketing, SEO, and content creation. Helping brands grow their online presence and engagement.",
-      "contactNumber": "+1 (555) 345-6789",
-      "contactEmail": "michael.jones@example.com",
-      "availableForWork": false,
-      "hourlyRate": 80.0,
-      "skills": ["SEO", "Digital Marketing", "Content Strategy", "Social Media Marketing"],
-      "certifications": ["Google Analytics Certified", "HubSpot Content Marketing Certification"],
-      "languages": ["English"]
-    },
-    {
-      "freelancerId": "609c72ef7f53d201f1d0e130",
-      "email": "emily.brown@example.com",
-      "firstName": "Emily",
-      "lastName": "Brown",
-      "location": "Chicago, IL",
-      "bio": "Professional software engineer with a focus on Python, Django, and cloud technologies. Enthusiastic about automation and DevOps practices.",
-      "contactNumber": "+1 (555) 456-7890",
-      "contactEmail": "emily.brown@example.com",
-      "availableForWork": true,
-      "hourlyRate": 55.0,
-      "skills": ["Python", "Django", "AWS", "DevOps"],
-      "certifications": ["AWS Certified Developer", "Certified Kubernetes Administrator"],
-      "languages": ["English", "German"]
-    },
-    {
-      "freelancerId": "609c72ef7f53d201f1d0e131",
-      "email": "chris.miller@example.com",
-      "firstName": "Chris",
-      "lastName": "Miller",
-      "location": "Austin, TX",
-      "bio": "Passionate about data analysis and machine learning. I specialize in transforming raw data into actionable insights to help businesses make informed decisions.",
-      "contactNumber": "+1 (555) 567-8901",
-      "contactEmail": "chris.miller@example.com",
-      "availableForWork": true,
-      "hourlyRate": 70.0,
-      "skills": ["Data Analysis", "Machine Learning", "Python", "SQL", "R"],
-      "certifications": ["Certified Data Scientist", "Google Cloud Data Engineer"],
-      "languages": ["English", "Portuguese"]
-    }
-  ]
+const freelancer = [
+  {
+    email: "john.doe@example.com",
+    contactMail:"john.doe@example.com",
+    name: "John Doe",
+    bio: "Experienced front-end developer with expertise in building modern, responsive websites and web applications.",
+    contactNumber: "+1234567890",
+    availableForWork: true,
+    hourlyRate: 50.0,
+    skills: ["HTML", "CSS", "JavaScript", "React", "Vue.js", "Sass"],
+    certifications: ["Certified Web Developer", "React Native Certified"],
+    languages: ["English", "Spanish"],
+    reviews: [
+      "Great work on the website design!",
+      "Excellent coding skills, fast delivery."
+    ],
+    location: { city: "New York", country: "USA" },
+    profileImg: "https://example.com/images/john_doe_profile.jpg",  // Added profile image link
+    workExperience: [
+      { role: "Frontend Developer", desc: "Built modern, responsive websites using React and CSS", startDate: new Date("2020-06-01"), endDate: new Date("2022-06-01") },
+      { role: "UI/UX Designer", desc: "Worked on designing intuitive user interfaces for web applications", startDate: new Date("2018-01-01"), endDate: new Date("2020-05-01") }
+    ],
+    portfolio: [
+      { title: "E-commerce Website", description: "E-commerce site built with React", link: "https://example.com/project1", type: "link" },
+      { title: "Personal Blog", description: "Personal blog with custom theme", link: "https://example.com/project2", type: "link" }
+    ]
+  },
+  {
+    email: "jane.smith@example.com",
+    name: "Jane Smith",
+    contactMail:"john.doe@example.com",
+    bio: "Creative front-end developer with a strong passion for designing seamless user experiences.",
+    contactNumber: "+0987654321",
+    availableForWork: false,
+    hourlyRate: 45.0,
+    skills: ["HTML", "CSS", "JavaScript", "React", "Node.js", "Bootstrap"],
+    certifications: ["Certified JavaScript Developer", "UX Design Specialist"],
+    languages: ["English", "French"],
+    reviews: [
+      "Fantastic developer! Really understood the requirements.",
+      "Highly recommend for any front-end project."
+    ],
+    location: { city: "London", country: "UK" },
+    profileImg: "https://example.com/images/jane_smith_profile.jpg",  // Added profile image link
+    workExperience: [
+      { role: "Frontend Developer", desc: "Developed several high-performance React apps", startDate: new Date("2019-03-01"), endDate: new Date("2022-03-01") },
+      { role: "Web Designer", desc: "Created custom themes and templates for WordPress sites", startDate: new Date("2017-04-01"), endDate: new Date("2019-02-01") }
+    ],
+    portfolio: [
+      { title: "Portfolio Website", description: "Portfolio website showcasing my work", link: "https://example.com/portfolio", type: "link" },
+      { title: "Landing Page Design", description: "Landing page for SaaS product", link: "https://example.com/project3", type: "link" }
+    ]
+  },
+  {
+    email: "mark.taylor@example.com",
+    contactMail:"john.doe@example.com",
+    name: "Mark Taylor",
+    bio: "Passionate front-end developer specializing in mobile-first design and responsive web applications.",
+    contactNumber: "+1122334455",
+    availableForWork: true,
+    hourlyRate: 60.0,
+    skills: ["HTML", "CSS", "JavaScript", "Angular", "TypeScript", "Material UI"],
+    certifications: ["Angular Certified Developer", "Mobile-First Design Specialist"],
+    languages: ["English"],
+    reviews: [
+      "Amazing work! Delivered ahead of schedule.",
+      "Mark has great attention to detail and design skills."
+    ],
+    location: { city: "Sydney", country: "Australia" },
+    profileImg: "https://example.com/images/mark_taylor_profile.jpg",  // Added profile image link
+    workExperience: [
+      { role: "Frontend Developer", desc: "Worked on Angular projects to build dynamic web apps", startDate: new Date("2020-02-01"), endDate: new Date("2022-02-01") },
+      { role: "Junior Frontend Developer", desc: "Assisted in building mobile-first responsive websites using Bootstrap", startDate: new Date("2018-06-01"), endDate: new Date("2020-01-01") }
+    ],
+    portfolio: [
+      { title: "Weather App", description: "Real-time weather app built with Angular", link: "https://example.com/weatherapp", type: "link" },
+      { title: "Business Landing Page", description: "Business landing page with custom design", link: "https://example.com/businesslanding", type: "link" }
+    ]
+  },
+  {
+    email: "susan.lee@example.com",
+    contactMail:"john.doe@example.com",
+    name: "Susan Lee",
+    bio: "Front-end developer with a focus on performance optimization and user-centered design.",
+    contactNumber: "+1230987654",
+    availableForWork: true,
+    hourlyRate: 55.0,
+    skills: ["HTML", "CSS", "JavaScript", "Vue.js", "Vuex", "Webpack"],
+    certifications: ["Certified Frontend Developer", "Performance Optimization Specialist"],
+    languages: ["English", "Chinese"],
+    reviews: [
+      "Susan was a great collaborator, and her work is outstanding.",
+      "Very reliable and professional."
+    ],
+    location: { city: "Toronto", country: "Canada" },
+    profileImg: "https://example.com/images/susan_lee_profile.jpg",  // Added profile image link
+    workExperience: [
+      { role: "Frontend Developer", desc: "Optimized web app performance and improved load times", startDate: new Date("2018-11-01"), endDate: new Date("2021-11-01") },
+      { role: "Web Developer", desc: "Worked with a team to develop a large-scale e-commerce site", startDate: new Date("2017-01-01"), endDate: new Date("2018-10-01") }
+    ],
+    portfolio: [
+      { title: "Online Store Optimization", description: "Optimized online store for fast loading", link: "https://example.com/onlinestore", type: "link" },
+      { title: "Vue.js Blog", description: "Vue.js based blog platform", link: "https://example.com/vueblog", type: "link" }
+    ]
+  },
+  {
+    email: "lucas.johnson@example.com",
+    contactMail:"john.doe@example.com",
+    name: "Lucas Johnson",
+    bio: "Innovative front-end developer who loves creating beautiful and interactive user interfaces.",
+    contactNumber: "+1928374650",
+    availableForWork: false,
+    hourlyRate: 70.0,
+    skills: ["HTML", "CSS", "JavaScript", "React", "Next.js", "Redux"],
+    certifications: ["React Certified Developer", "UX/UI Design Fundamentals"],
+    languages: ["English", "German"],
+    reviews: [
+      "A fantastic developer with great communication skills.",
+      "Delivered high-quality work quickly and efficiently."
+    ],
+    location: { city: "Berlin", country: "Germany" },
+    profileImg: "https://example.com/images/lucas_johnson_profile.jpg",  // Added profile image link
+    workExperience: [
+      { role: "Lead Frontend Developer", desc: "Led a team to create an interactive React application", startDate: new Date("2019-08-01"), endDate: new Date("2022-08-01") },
+      { role: "UI Developer", desc: "Developed UI components for a SaaS application", startDate: new Date("2017-05-01"), endDate: new Date("2019-07-01") }
+    ],
+    portfolio: [
+      { title: "SaaS Dashboard", description: "SaaS Dashboard built with React", link: "https://example.com/saas-dashboard", type: "link" },
+      { title: "Next.js Blog", description: "Personal blog built with Next.js", link: "https://example.com/blog", type: "link" }
+    ]
+  }
+];

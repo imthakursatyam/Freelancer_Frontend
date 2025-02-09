@@ -190,7 +190,7 @@ export default function jobposts({jobPosts}) {
                                skills
                              </Heading>
                               <Stack direction="row" mt={4} spacing={4}>
-                                {job.skills.map((name, idx) => (
+                                {(job.skills && job.skills.length > 0) && job.skills.map((name, idx) => (
                                    <Badge variant="solid" rounded="md" px={"5px"} py={"3px"}  colorScheme='green'>{name}</Badge>
                                 ))}
                              </Stack>
@@ -201,7 +201,7 @@ export default function jobposts({jobPosts}) {
                                Experience
                              </Heading>
                              <Text pt='2' fontSize='sm'>
-                               {job.exp.map((e) => e+", ")}
+                               {job.exp.length> 0 && job.exp.map((e) => e+", ")}
                              </Text>
                            </Box>
                            <Box>
@@ -209,7 +209,7 @@ export default function jobposts({jobPosts}) {
                               Location
                              </Heading>
                              <Text pt='2' fontSize='sm'>
-                               {Object.values(job.address).map((e)=> e+", ")}
+                               {(job.address && Object.values(job.address).length > 0) && Object.values(job.address).map((e)=> e+", ")}
                              </Text>
                              </Box>
                              <Box>
@@ -220,7 +220,7 @@ export default function jobposts({jobPosts}) {
                                 {job.otherInfo}
                             </Text>
                             </Box>
-                            {job.website.length > 0 && <Box>
+                            {(job.website && job.website.length > 0) && <Box>
                               <Heading size='xs' textTransform='uppercase'>
                                 Website
                               </Heading>

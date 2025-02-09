@@ -30,6 +30,7 @@ import {
 } from '@chakra-ui/react'
 import { useToast } from '@chakra-ui/react'
 import cookie from "cookie";
+import { useRouter } from 'next/router';
 
 
 export async function getServerSideProps(context) {
@@ -143,7 +144,7 @@ const Form1 = ({skill, setSkill, exp, setExp, form, setForm}) => {
                 bg: 'gray.800',
               }}
               color="gray.500"
-              rounded="md" value={skill.map((e) => e)} disabled id="desc" type="text" />
+              rounded="md" value={skill && skill.map((e) => e)} disabled id="desc" type="text" />
       </FormControl>
       <FormControl>
       <FormLabel fontWeight={'bold'} mt="2%">
@@ -164,7 +165,7 @@ const Form1 = ({skill, setSkill, exp, setExp, form, setForm}) => {
                 bg: 'gray.800',
               }}
               color="gray.500"
-              rounded="md" value={exp.map((e) => e)} disabled id="desc" type="text" />
+              rounded="md" value={exp && exp.map((e) => e)} disabled id="desc" type="text" />
       </FormControl>
     </>
   )
@@ -394,6 +395,7 @@ const steps = [
 
 export default function Multistep({jobPost}) {
   const toast = useToast()
+  const router = useRouter();
   const [step, setStep] = React.useState(1)
   const [progress, setProgress] = React.useState(33.33);
   const { activeStep } = useSteps({
@@ -410,21 +412,64 @@ export default function Multistep({jobPost}) {
     if (jobPost == null) return; // show an error 
     const {title, desc, otherInfo, website, exp, skills} = jobPost;
     const {country, state, pincode, landmark, city} = jobPost.address;
-    setExp(exp);
-    setSkill(skills);
+    setExp((exp|| []));
+    setSkill((skills || []));
     setForm({title:title, desc:desc, otherInfo:otherInfo, website:website, country:country, state:state, pincode:pincode, city:city, landmark:landmark});
   }, [])
 
   const handleOnSubmit = async () => {
-    const finalForm = {title:form.title, desc:form.desc, address:(form.landmark+", "+form.city+", "+form.state+", "+form.country+", "+form.pincode), otherInfo:form.otherInfo, website:form.website, skill:skill, experience:exp}
-    console.log(finalForm)
-    toast({
-      title: 'Account created.',
-      description: "We've created your account for you.",
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    })
+    const {title, desc, otherInfo, website, country, state, pincode, landmark, city} = form;
+    let headersList = {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+     }
+     
+     let bodyContent = JSON.stringify({
+        "id": jobPost.id,
+       "title": title,
+       "desc": desc,
+       "otherInfo": otherInfo,
+       "website": website,
+       "skills": skill,
+       "exp":exp,
+       "address": {
+        "country":country,
+        "state":state,
+        "pincode":pincode,
+        "landmark":landmark,
+        "city":city,
+       },
+       "email":jobPost.email,
+       "date":jobPost.date
+     });
+     
+     let response = await fetch("http://localhost:8080/recruiter/updateJobPost", { 
+       method: "POST",
+       body: bodyContent,
+       headers: headersList,
+       credentials: "include"
+     });
+
+     let data = await response.json();
+     console.log(data, bodyContent)
+     if (data.success) {
+      toast({
+        title: 'JobPost',
+        description: data.message,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      })
+    } else {
+      toast({
+        title: 'JobPost',
+        description: data.message,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    }
+    router.push("/recruiter/jobpost/view");
   }
   return (
     <>
