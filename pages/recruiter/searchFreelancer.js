@@ -142,7 +142,7 @@ function PriceWrapper(props) {
 
 
 export async function getServerSideProps(context) {
-    try {
+  try {
       
     const cookies = context.req.headers.cookie || '';
     const parsedCookies = cookie.parse(cookies);

@@ -18,241 +18,197 @@ import {
 } from '@chakra-ui/react'
 import React from 'react';
 import { FaCheckCircle } from 'react-icons/fa'
+import cookie from "cookie";
 
 import { Input, InputGroup, InputLeftElement, Icon } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
+import jobposts from '../recruiter/jobpost/view';
 
- function SocialProfileSimple({profile}) {
-  return (
-    <Center py={6}>
-      <Box
-        maxW={'320px'}
-        w={'full'}
-        bg={useColorModeValue('white', 'gray.900')}
-        boxShadow={'2xl'}
-        rounded={'lg'}
-        p={6}
-        textAlign={'center'}>
-        <Avatar
-          size={'xl'}
-          src={
-            'https://images.unsplash.com/photo-1520810627419-35e362c5dc07?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'
-          }
-          mb={4}
-          pos={'relative'}
-          _after={{
-            content: '""',
-            w: 4,
-            h: 4,
-            bg: 'green.300',
-            border: '2px solid white',
-            rounded: 'full',
-            pos: 'absolute',
-            bottom: 0,
-            right: 3,
-          }}
-        />
-        <Heading fontSize={'2xl'} fontFamily={'body'}>
-          {profile.firstName + " " + profile.lastName}
-        </Heading>
-        <Text fontWeight={600} color={'gray.500'} mb={4}>
-          {profile.email}
-        </Text>
-        <Text
-          textAlign={'center'}
-          color={useColorModeValue('gray.700', 'gray.400')}
-          px={3} className='text-sm'>
-           {profile.bio} 
-         
-        </Text>
 
-        <Stack display={"flex"} align="center" py={5}>
-          <Wrap maxWidth={"95%"} mt={6} spacing={5} overflow={"hidden"}>
-            <WrapItem display={"flex"}>
-            {
-            profile.skills.map((skill, index) => {
-              return <Badge key={index}
-              px={2}
-              py={1}
-              bg={useColorModeValue('gray.50', 'gray.800')}
-              fontWeight={'400'} >
-              #{skill}
-            </Badge>
-            })
-          }
-            </WrapItem>
-          </Wrap>
-        </Stack>
-          
+
+export async function getServerSideProps(context) {
+  try {
       
+    const cookies = context.req.headers.cookie || '';
+    const parsedCookies = cookie.parse(cookies);
+    let headersList = {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Cookie": cookies
+     }
+    let response = await fetch("http://localhost:8080/jobPost/getAllPost", { 
+      method: "POST",
+      headers: headersList,
+      credentials: "include"
+    });
 
-        <Stack mt={8} direction={'row'} spacing={4}>
-          <Button
-            flex={1}
-            fontSize={'sm'}
-            rounded={'full'}
-            >
-            Message
-          </Button>
-          <Button
-            flex={1}
-            fontSize={'sm'}
-            rounded={'full'}
-            bg={'green.400'}
-            color={'white'}
-            boxShadow={
-              '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-            }
-            _hover={{
-              bg: 'green.500',
-            }}
-            _focus={{
-              bg: 'green.500',
-            }}>
-            Follow
-          </Button>
-        </Stack>
-      </Box>
-    </Center>
-  )
+    let data = await response.json();
+    //console.log(data)
+    if(!data.success) throw new Error("No Jobposts");
+    
+    return {
+      props: {
+        jobPosts: data.jobPosts,
+      },
+    };
+  } catch (error) {
+   console.log(error)
+    return {
+      props: {
+        jobPosts: [],
+      },
+    };
+  }
+ 
 }
-
-
-function PriceWrapper(props) {
-  const { children } = props
-
-  return (
-    <Box
-      mb={4}
-      shadow="base"
-      borderWidth="1px"
-      alignSelf={{ base: 'center', lg: 'flex-start' }}
-      borderColor={useColorModeValue('gray.200', 'gray.500')}
-      borderRadius={'xl'}>
-      {children}
-    </Box>
-  )
-}
-
-export default function ThreeTierPricing() {
+export default function ThreeTierPricing({jobPosts}) {
   const [searchTerm, setSearchTerm] = React.useState('');
-
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
+  const [isSearching, setSearching] = React.useState(false);
+  const [searchedJobPosts, setSearchedJobPosts] = React.useState([]);
+  
+    
+    const handleSearchChange =  (event) => {
+      console.log(event.target.value)
+      if (event.target.value.length >= 3) {
+         setSearching(true);
+         handleSearch(event.target.value);
+         // is user is already typing  no need to change state
+      }
+      setSearchTerm(event.target.value);
+      if (event.target.value.length <= 2) setSearching(false); 
+    };
+    const handleSearch = async (query) => {
+      let headersList = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+       }
+      let response = await fetch("http://localhost:8080/jobPost/searchJobPost", { 
+        method: "POST",
+        body: JSON.stringify({"query": query}),
+        headers: headersList,
+        credentials: "include"
+      });
+  
+      let data = await response.json();
+      if (data.success) setSearchedJobPosts(data.jobPosts);
+    }
+ 
   return (
-    <Box py={12}>
-      <VStack spacing={2} textAlign="center">
-        <Heading as="h1" fontSize="4xl">
-          Freelancer that fit your need
-        </Heading>
-        <Text fontSize="lg" color={'gray.500'}>
-          Start with 14-day free trial. No credit card needed. Cancel at anytime.
-        </Text>
-      </VStack>
-      <Box width="100%" maxWidth="600px" mx="auto" mt={5}>
-      <InputGroup bg={"white"} rounded={"lg"}>
-        <InputLeftElement pointerEvents="none">
-          <Icon className='mt-1.5 text-bold' as={SearchIcon} color="green.500" />
-        </InputLeftElement>
-        <Input
-          type="text"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          placeholder="Search..."
-          size="lg"
-          borderRadius="md"
-          boxShadow="sm"
-        />
-      </InputGroup>
-    </Box>
-      <Stack display={"flex"} align="center" py={10}>
-        <Wrap spacing={10} justify="center">
-          {(freelancers).map((profile, index) => (
-            <WrapItem key={index}>
-              <SocialProfileSimple profile={profile} />
-            </WrapItem>
-          ))}
-        </Wrap>
-      </Stack>
-    </Box>
+    <div className="bg-gray-50 py-24 sm:py-32">
+    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto flex items-center justify-between min-w-full max-w-2xl lg:mx-0">
+        <Box className="" mt={5} >
+        <h2 className="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">From The Top Recruiters</h2>
+        <p className="mt-2 text-lg/8 text-gray-600">Learn how to grow your business with our expert advice.</p>
+        </Box>
+         <Box className='' mt={5}>
+              <InputGroup bg={"white"} rounded={"lg"}>
+                <InputLeftElement pointerEvents="none">
+                  <Icon className='mt-1.5 text-bold' as={SearchIcon} color="green.500" />
+                </InputLeftElement>
+                <Input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => handleSearchChange(e)}
+                  placeholder="Search..."
+                  size="lg"
+                  borderRadius="md"
+                  boxShadow="sm"
+                />
+              </InputGroup>
+            </Box>
+      </div>
+      <div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-300 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3 ">
+        {(jobPosts && !isSearching) && jobPosts.map((post) => (
+          <article key={post.id} className="flex max-w-xl p-3 flex-col items-start justify-between rounded-md bg-white">
+            <div className="flex items-center gap-x-4 text-xs">
+              <time dateTime={post.date} className="text-gray-500">
+                {post.date}
+              </time>
+              
+            </div>
+            <div className="group relative border-b border-gray-200 pb-4">
+              <h3 className="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600">
+                <a href={"#"}>
+                  <span className="absolute inset-0" />
+                  {post.title}
+                </a>
+              </h3>
+              <p className="mt-5 line-clamp-3 text-sm/6 text-gray-600">{post.desc}</p>
+            </div>
+            
+            
+            <span className='text-lg/6 mt-4 font-semibold text-gray-900 '>
+                  Skills
+            </span>
+            <div className="relative min-w-full flex items-center gap-x-4 border-b border-gray-200 pb-4">
+                
+              <div className="text-sm/6 p-1 ">
+                {post.skills && post.skills.map((skill, index) => {
+                  return <span
+                  className="inline-block z-10 rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100 m-1 "
+                >
+                  {skill}
+                </span>
+                })}
+              </div>
+            </div>
+            <Stack className='my-3 px-2' direction='row' spacing={4} align='center'>
+                <Button size='sm' colorScheme='green' variant='solid'>
+                   Apply
+                </Button>
+                <Button  size='sm' colorScheme='green' variant='outline'>
+                  Details
+               </Button>
+q           </Stack>
+          </article>
+        ))}
+         {(isSearching && searchedJobPosts) && searchedJobPosts.map((post) => (
+          <article key={post.id} className="flex max-w-xl p-3 flex-col items-start justify-between rounded-md bg-white">
+            <div className="flex items-center gap-x-4 text-xs">
+              <time dateTime={post.date} className="text-gray-500">
+                {post.date}
+              </time>
+              
+            </div>
+            <div className="group relative border-b border-gray-200 pb-4">
+              <h3 className="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600">
+                <a href={"#"}>
+                  <span className="absolute inset-0" />
+                  {post.title}
+                </a>
+              </h3>
+              <p className="mt-5 line-clamp-3 text-sm/6 text-gray-600">{post.desc}</p>
+            </div>
+            
+            
+            <span className='text-lg/6 mt-4 font-semibold text-gray-900 '>
+                  Skills
+            </span>
+            <div className="relative min-w-full flex items-center gap-x-4 border-b border-gray-200 pb-4">
+                
+              <div className="text-sm/6 p-1 ">
+                {post.skills && post.skills.map((skill, index) => {
+                  return <span
+                  className="inline-block z-10 rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100 m-1 "
+                >
+                  {skill}
+                </span>
+                })}
+              </div>
+            </div>
+            <Stack className='my-3 px-2' direction='row' spacing={4} align='center'>
+                <Button size='sm' colorScheme='green' variant='solid'>
+                   Apply
+                </Button>
+                <Button  size='sm' colorScheme='green' variant='outline'>
+                  Details
+               </Button>
+q           </Stack>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
   )
 }
-
-const freelancers = [
-    {
-      "freelancerId": "609c72ef7f53d201f1d0e12d",
-      "email": "john.doe@example.com",
-      "firstName": "John",
-      "lastName": "Doe",
-      "location": "San Francisco, CA",
-      "bio": "Experienced full-stack developer with a passion for building scalable web applications. Expert in JavaScript, React, Node.js, and MongoDB.",
-      "contactNumber": "+1 (555) 123-4567",
-      "contactEmail": "john.doe@example.com",
-      "availableForWork": true,
-      "hourlyRate": 45.0,
-      "skills": ["JavaScript", "React", "Node.js", "MongoDB"],
-      "certifications": ["Certified JavaScript Developer", "AWS Certified Solutions Architect"],
-      "languages": ["English", "Spanish"]
-    },
-    {
-      "freelancerId": "609c72ef7f53d201f1d0e12e",
-      "email": "alice.smith@example.com",
-      "firstName": "Alice",
-      "lastName": "Smith",
-      "location": "New York, NY",
-      "bio": "Creative graphic designer with 5+ years of experience in branding, UI/UX design, and print media. I turn ideas into visually stunning designs.",
-      "contactNumber": "+1 (555) 234-5678",
-      "contactEmail": "alice.smith@example.com",
-      "availableForWork": true,
-      "hourlyRate": 60.0,
-      "skills": ["Photoshop", "Illustrator", "UI/UX Design", "Branding"],
-      "certifications": ["Adobe Certified Expert", "UI/UX Design Specialist"],
-      "languages": ["English", "French"]
-    },
-    {
-      "freelancerId": "609c72ef7f53d201f1d0e12f",
-      "email": "michael.jones@example.com",
-      "firstName": "Michael",
-      "lastName": "Jones",
-      "location": "Los Angeles, CA",
-      "bio": "Experienced marketing strategist specializing in digital marketing, SEO, and content creation. Helping brands grow their online presence and engagement.",
-      "contactNumber": "+1 (555) 345-6789",
-      "contactEmail": "michael.jones@example.com",
-      "availableForWork": false,
-      "hourlyRate": 80.0,
-      "skills": ["SEO", "Digital Marketing", "Content Strategy", "Social Media Marketing"],
-      "certifications": ["Google Analytics Certified", "HubSpot Content Marketing Certification"],
-      "languages": ["English"]
-    },
-    {
-      "freelancerId": "609c72ef7f53d201f1d0e130",
-      "email": "emily.brown@example.com",
-      "firstName": "Emily",
-      "lastName": "Brown",
-      "location": "Chicago, IL",
-      "bio": "Professional software engineer with a focus on Python, Django, and cloud technologies. Enthusiastic about automation and DevOps practices.",
-      "contactNumber": "+1 (555) 456-7890",
-      "contactEmail": "emily.brown@example.com",
-      "availableForWork": true,
-      "hourlyRate": 55.0,
-      "skills": ["Python", "Django", "AWS", "DevOps"],
-      "certifications": ["AWS Certified Developer", "Certified Kubernetes Administrator"],
-      "languages": ["English", "German"]
-    },
-    {
-      "freelancerId": "609c72ef7f53d201f1d0e131",
-      "email": "chris.miller@example.com",
-      "firstName": "Chris",
-      "lastName": "Miller",
-      "location": "Austin, TX",
-      "bio": "Passionate about data analysis and machine learning. I specialize in transforming raw data into actionable insights to help businesses make informed decisions.",
-      "contactNumber": "+1 (555) 567-8901",
-      "contactEmail": "chris.miller@example.com",
-      "availableForWork": true,
-      "hourlyRate": 70.0,
-      "skills": ["Data Analysis", "Machine Learning", "Python", "SQL", "R"],
-      "certifications": ["Certified Data Scientist", "Google Cloud Data Engineer"],
-      "languages": ["English", "Portuguese"]
-    }
-  ]

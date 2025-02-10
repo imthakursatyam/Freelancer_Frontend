@@ -1,210 +1,554 @@
-import React from 'react'
-import { Button } from '@chakra-ui/react'
-import { Card, CardHeader, CardBody, Heading, Stack, StackDivider, Box, Text, Tag, TagLabel, TagCloseButton, Highlight, Flex, Badge } from '@chakra-ui/react'
-import { MdOutlineDelete, MdEditDocument } from "react-icons/md";
-import Link from "next/link";
-const jobPosts = [
-  {
-    "id": "603d2149e9b1a1c92c7a8a5b",
-    "name": "Software Developer",
-    "desc": "We are looking for a talented Software Developer to join our dynamic team. You will be responsible for developing cutting-edge software solutions.",
-    "skills": ["Java", "Spring Boot", "MongoDB", "Git", "Docker"],
-    "exp": ["2-3 years", "Familiarity with Agile methodologies"],
-    "address": {
-      "landmark": "Near Central Park",
-      "state": "California",
-      "city": "San Francisco",
-      "pincode": "94107",
-      "country": "USA"
-    },
-    "otherInfo": "Competitive salary and benefits.",
-    "website": "https://www.examplecompany.com",
-    "date": "2025-01-30"
-  },
-  {
-    "id": "603d2149e9b1a1c92c7a8a5c2",
-    "name": "UX/UI Designer",
-    "desc": "Join our design team and help us create seamless user experiences and beautiful interfaces.",
-    "skills": ["Figma", "Adobe XD", "User Research", "Wireframing", "Prototyping"],
-    "exp": ["3+ years", "Experience in user-centered design process"],
-    "address": {
-      "landmark": "Near Downtown",
-      "state": "New York",
-      "city": "New York City",
-      "pincode": "10001",
-      "country": "USA"
-    },
-    "otherInfo": "Flexible working hours and remote work options.",
-    "website": "https://www.designcompany.com",
-    "date": "2025-01-28"
-  },
-  {
-    "id": "603d2149e9b1a1c92c7a8a5c3",
-    "name": "Product Manager",
-    "desc": "Looking for a skilled product manager to lead our product development team and drive new product initiatives.",
-    "skills": ["Agile", "Product Roadmaps", "Market Research", "Leadership", "Strategy"],
-    "exp": ["5+ years", "Proven track record in product development"],
-    "address": {
-      "landmark": "Near Riverside",
-      "state": "Texas",
-      "city": "Austin",
-      "pincode": "73301",
-      "country": "USA"
-    },
-    "otherInfo": "Health benefits and team-building activities.",
-    "website": "https://www.productcompany.com",
-    "date": "2025-01-29"
-  },
-  {
-    "id": "603d2149e9b1a1c92c7a8a5c4",
-    "name": "Data Scientist",
-    "desc": "We are looking for an experienced Data Scientist to analyze complex data sets and provide actionable insights.",
-    "skills": ["Python", "Machine Learning", "Data Analysis", "SQL", "Statistics"],
-    "exp": ["4+ years", "Experience with data-driven decision-making"],
-    "address": {
-      "landmark": "Near Tech Park",
-      "state": "California",
-      "city": "Los Angeles",
-      "pincode": "90001",
-      "country": "USA"
-    },
-    "otherInfo": "Annual performance bonuses and stock options.",
-    "website": "https://www.datacompany.com",
-    "date": "2025-01-27"
-  },
-  {
-    "id": "603d2149e9b1a1c92c7a8a5c5",
-    "name": "Marketing Specialist",
-    "desc": "Seeking a creative marketing specialist to help develop and implement marketing strategies for our brand.",
-    "skills": ["SEO", "Social Media Marketing", "Content Strategy", "Google Analytics", "Email Campaigns"],
-    "exp": ["3+ years", "Experience in digital marketing"],
-    "address": {
-      "landmark": "Near City Mall",
-      "state": "Florida",
-      "city": "Miami",
-      "pincode": "33101",
-      "country": "USA"
-    },
-    "otherInfo": "Paid vacations and growth opportunities.",
-    "website": "https://www.marketingcompany.com",
-    "date": "2025-01-26"
-  },
-  {
-    "id": "603d2149e9b1a1c92c7a8a5c6",
-    "name": "Sales Executive",
-    "desc": "We are looking for an energetic sales executive to drive sales and build relationships with our clients.",
-    "skills": ["Salesforce", "Negotiation", "B2B Sales", "CRM", "Client Relationship"],
-    "exp": ["2-4 years", "Proven sales performance"],
-    "address": {
-      "landmark": "Near Airport",
-      "state": "Illinois",
-      "city": "Chicago",
-      "pincode": "60601",
-      "country": "USA"
-    },
-    "otherInfo": "Great incentives and career growth.",
-    "website": "https://www.salescompany.com",
-    "date": "2025-01-25"
-  }
-];
+import {
+  Heading,
+  Avatar,
+  Box,
+  Center,
+  Text,
+  Badge,
+  useColorModeValue,
+  Stack,
+  HStack,
+  VStack,
+  List,
+  ListItem,
+  ListIcon,
+  Button,
+  Wrap,
+  WrapItem
+} from '@chakra-ui/react'
+import React from 'react';
+import { FaCheckCircle } from 'react-icons/fa'
 
 
+import { Input, InputGroup, InputLeftElement, Icon } from '@chakra-ui/react';
+import { SearchIcon } from '@chakra-ui/icons';
 
-export default function jobposts() {
+ function SocialProfileSimple({profile}) {
   return (
-    <div className='min-w-full'> 
-        <div className='flex justify-between items-center w-full md:w-3/4 mx-auto my-8'>
-            <div className='w-full'>
-            <Heading className='my-4' lineHeight='tall'>
-              <Highlight
-                query={['spotlight', 'emphasize', 'Accentuate']}
-                styles={{ px: '2', py: '1', rounded: 'full', bg: 'green.200' }}
-              >
-                With the Highlight component, you can spotlight, emphasize and accentuate
-                words.
-              </Highlight>
-            </Heading>
-                <div className='mt-8 '>
-                    {jobPosts.map((job, index) => (
-                       <Card className='mb-5 p-2 '  key={index}>
-                       <Flex >
-                       <CardHeader>
-                         <Heading color={"green.700"} size='md'>{job.name}</Heading>
-                       </CardHeader>
-                        <Link href={"#"} className='my-auto mr-4 ml-auto'><Button  bg="red.500" ><MdOutlineDelete className='text-white' /></Button></Link>
-                        <Link href={"/recruiter/jobpost/update"} className='my-auto mr-4'><Button my="auto" bg="yellow.400" justifySelf={"end"}><MdEditDocument className='text-black'/></Button></Link>
-                        </Flex>
-                       <CardBody>
-                         <Stack divider={<StackDivider />} spacing='4'>
-                           <Box>
-                             <Heading size='xs' textTransform='uppercase'>
-                              Description
-                             </Heading>
-                             <Text pt='2' fontSize='sm'>
-                               {job.desc}
-                             </Text>
-                           </Box>
-                           <Box>
-                             <Heading size='xs' textTransform='uppercase'>
-                               skills
-                             </Heading>
-                              <Stack direction="row" mt={4} spacing={4}>
-                                {job.skills.map((name, idx) => (
-                                   <Badge variant="solid" rounded="md" px={"5px"} py={"3px"}  colorScheme='green'>{name}</Badge>
-                                ))}
-                             </Stack>
-                           </Box>
+    <Center py={6}>
+      <Box
+        maxW={'320px'}
+        w={'full'}
+        bg={useColorModeValue('white', 'gray.900')}
+        boxShadow={'2xl'}
+        rounded={'lg'}
+        p={6}
+        textAlign={'center'}>
+        <Avatar
+          size={'xl'}
+          src={
+            'https://images.unsplash.com/photo-1520810627419-35e362c5dc07?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'
+          }
+          mb={4}
+          pos={'relative'}
+          _after={{
+            content: '""',
+            w: 4,
+            h: 4,
+            bg: 'green.300',
+            border: '2px solid white',
+            rounded: 'full',
+            pos: 'absolute',
+            bottom: 0,
+            right: 3,
+          }}
+        />
+        <Heading fontSize={'2xl'} fontFamily={'body'}>
+          {profile.firstName + " " + profile.lastName}
+        </Heading>
+        <Text fontWeight={600} color={'gray.500'} mb={4}>
+          {profile.email}
+        </Text>
+        <Text
+          textAlign={'center'}
+          color={useColorModeValue('gray.700', 'gray.400')}
+          px={3} className='text-sm'>
+           {profile.bio} 
+         
+        </Text>
 
-                           <Box>
-                             <Heading size='xs' textTransform='uppercase'>
-                               Experience
-                             </Heading>
-                             <Text pt='2' fontSize='sm'>
-                               {job.exp.map((e) => e+", ")}
-                             </Text>
-                           </Box>
-                           <Box>
-                           <Heading size='xs' textTransform='uppercase'>
-                              Location
-                             </Heading>
-                             <Text pt='2' fontSize='sm'>
-                               {Object.values(job.address).map((e)=> e+", ")}
-                             </Text>
-                             </Box>
-                             <Box>
-                              <Heading size='xs' textTransform='uppercase'>
-                                Other Info
-                              </Heading>
-                              <Text pt='2' fontSize='sm'>
-                                {job.otherInfo}
-                            </Text>
-                            </Box>
-                            {job.website.length > 0 && <Box>
-                              <Heading size='xs' textTransform='uppercase'>
-                                Website
-                              </Heading>
-                              <Text pt='2' fontSize='sm'>
-                                {job.website}
-                            </Text>
-                            </Box>}
-                            <Box>
-                              <Heading size='xs' textTransform='uppercase'>
-                                Posted On
-                              </Heading>
-                              <Text pt='2' fontSize='sm'>
-                                {job.date}
-                            </Text>
-                            </Box>
-                         </Stack>
-                       </CardBody>
-                      
-                     </Card>
-                        
-                    ))}
-                </div>
-            </div>
+        <Stack display={"flex"} align="center" py={5}>
+          <Wrap maxWidth={"95%"} mt={6} spacing={5} overflow={"hidden"}>
+            <WrapItem display={"flex"}>
+            {
+            profile.skills.map((skill, index) => {
+              return <Badge key={index}
+              px={2}
+              py={1}
+              bg={useColorModeValue('gray.50', 'gray.800')}
+              fontWeight={'400'} >
+              #{skill}
+            </Badge>
+            })
+          }
+            </WrapItem>
+          </Wrap>
+        </Stack>
+          
+      
 
-        </div>
-    </div>
+        <Stack mt={8} direction={'row'} spacing={4}>
+          <Button
+            flex={1}
+            fontSize={'sm'}
+            rounded={'full'}
+            >
+            Message
+          </Button>
+          <Button
+            flex={1}
+            fontSize={'sm'}
+            rounded={'full'}
+            bg={'green.400'}
+            color={'white'}
+            boxShadow={
+              '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+            }
+            _hover={{
+              bg: 'green.500',
+            }}
+            _focus={{
+              bg: 'green.500',
+            }}>
+            Follow
+          </Button>
+        </Stack>
+      </Box>
+    </Center>
   )
 }
+
+
+function PriceWrapper(props) {
+  const { children } = props
+
+  return (
+    <Box
+      mb={4}
+      shadow="base"
+      borderWidth="1px"
+      alignSelf={{ base: 'center', lg: 'flex-start' }}
+      borderColor={useColorModeValue('gray.200', 'gray.500')}
+      borderRadius={'xl'}>
+      {children}
+    </Box>
+  )
+}
+
+export default function ThreeTierPricing() {
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const posts = [
+    {
+      id: 1,
+      title: 'Boost your conversion rate',
+      href: '#',
+      description:
+        'Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel. Iusto corrupti dicta.',
+      date: 'Mar 16, 2020',
+      datetime: '2020-03-16',
+      category: { title: 'Marketing', href: '#' },
+      author: {
+        name: 'Michael Foster',
+        role: 'Co-Founder / CTO',
+        href: '#',
+        imageUrl:
+          'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+      },
+    },
+    {
+      id: 1,
+      title: 'Boost your conversion rate',
+      href: '#',
+      description:
+        'Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel. Iusto corrupti dicta.',
+      date: 'Mar 16, 2020',
+      datetime: '2020-03-16',
+      category: { title: 'Marketing', href: '#' },
+      author: {
+        name: 'Michael Foster',
+        role: 'Co-Founder / CTO',
+        href: '#',
+        imageUrl:
+          'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+      },
+    },
+    {
+      id: 1,
+      title: 'Boost your conversion rate',
+      href: '#',
+      description:
+        'Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel. Iusto corrupti dicta.',
+      date: 'Mar 16, 2020',
+      datetime: '2020-03-16',
+      category: { title: 'Marketing', href: '#' },
+      author: {
+        name: 'Michael Foster',
+        role: 'Co-Founder / CTO',
+        href: '#',
+        imageUrl:
+          'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+      },
+    },
+    {
+      id: 1,
+      title: 'Boost your conversion rate',
+      href: '#',
+      description:
+        'Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel. Iusto corrupti dicta.',
+      date: 'Mar 16, 2020',
+      datetime: '2020-03-16',
+      category: { title: 'Marketing', href: '#' },
+      author: {
+        name: 'Michael Foster',
+        role: 'Co-Founder / CTO',
+        href: '#',
+        imageUrl:
+          'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+      },
+    },
+    // More posts...
+  ]
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+  return (
+    <div className="bg-gray-50 py-24 sm:py-32">
+    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto flex items-center justify-between min-w-full max-w-2xl lg:mx-0">
+        <Box className="" mt={5} >
+        <h2 className="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">From The Top Recruiters</h2>
+        <p className="mt-2 text-lg/8 text-gray-600">Learn how to grow your business with our expert advice.</p>
+        </Box>
+         <Box className='' mt={5}>
+              <InputGroup bg={"white"} rounded={"lg"}>
+                <InputLeftElement pointerEvents="none">
+                  <Icon className='mt-1.5 text-bold' as={SearchIcon} color="green.500" />
+                </InputLeftElement>
+                <Input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => handleSearchChange(e)}
+                  placeholder="Search..."
+                  size="lg"
+                  borderRadius="md"
+                  boxShadow="sm"
+                />
+              </InputGroup>
+            </Box>
+      </div>
+      <div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-300 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3 ">
+        {jobPosts.map((post) => (
+          <article key={post.id} className="flex max-w-xl p-3 flex-col items-start justify-between rounded-md bg-white">
+            <div className="flex items-center gap-x-4 text-xs">
+              <time dateTime={post.date} className="text-gray-500">
+                {post.date}
+              </time>
+              
+            </div>
+            <div className="group relative border-b border-gray-200 pb-4">
+              <h3 className="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600">
+                <a href={"#"}>
+                  <span className="absolute inset-0" />
+                  {post.title}
+                </a>
+              </h3>
+              <p className="mt-5 line-clamp-3 text-sm/6 text-gray-600">{post.desc}</p>
+            </div>
+            
+            
+            <span className='text-lg/6 mt-4 font-semibold text-gray-900 '>
+                  Skills
+            </span>
+            <div className="relative min-w-full flex items-center gap-x-4 border-b border-gray-200 pb-4">
+                
+              <div className="text-sm/6 p-1 ">
+                {post.skills && post.skills.map((skill, index) => {
+                  return <span
+                  className="inline-block z-10 rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100 m-1 "
+                >
+                  {skill}
+                </span>
+                })}
+              </div>
+            </div>
+            <Stack className='my-3 px-2' direction='row' spacing={4} align='center'>
+                <Button size='sm' colorScheme='green' variant='solid'>
+                   Apply
+                </Button>
+                <Button  size='sm' colorScheme='green' variant='outline'>
+                  Details
+               </Button>
+q           </Stack>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+  )
+}
+const jobPosts = [
+  {
+    "email": "imthakursatyam@gmail.com",
+    "id": "67a385bdcbe8b02bd1d54321",
+    "title": "Software Developer",
+    "desc": "Full-stack developer with experience in building scalable applications.",
+    "skills": [
+      "next js",
+      "java",
+      "c++",
+      "rust",
+      "ruby on rails"
+    ],
+    "exp": [
+      "5 years in web development",
+      "3 years leading teams",
+      "Worked on microservices architectures"
+    ],
+    "address": {
+      "country": "Mexico",
+      "state": "London",
+      "pincode": "255215",
+      "landmark": "New High Streets",
+      "city": "New York"
+    },
+    "otherInfo": "Passionate about open-source contributions.",
+    "website": "https://johndoe.dev",
+    "date": "2025-01-20"
+  },
+  {
+    "email": "imthakursatyam@gmail.com",
+    "id": "67a385bdcbe8b02bd1d54322",
+    "title": "UX/UI Designer",
+    "desc": "Experienced designer creating intuitive and user-friendly interfaces.",
+    "skills": [
+      "javascript",
+      "reactjs",
+      "figma",
+      "canva"
+    ],
+    "exp": [
+      "8 years in design",
+      "Led design teams for large projects",
+      "Focus on user-centered design"
+    ],
+    "address": {
+      "country": "Canada",
+      "state": "CA",
+      "pincode": "124512",
+      "landmark": "High Streets",
+      "city": "San Francisco"
+    },
+    "otherInfo": "Enjoys collaborating with developers to create seamless experiences.",
+    "website": "https://sarahsmithdesigns.com",
+    "date": null
+  },
+  {
+    "email": null,
+    "id": "67a385bdcbe8b02bd1d54323",
+    "title": "Project Manager",
+    "desc": "Project manager with expertise in agile methodologies and cross-functional teams.",
+    "skills": null,
+    "exp": [
+      "10 years managing software projects",
+      "Certified ScrumMaster",
+      "Experienced with international teams"
+    ],
+    "address": {
+      "state": "IL",
+      "pincode": "5455555",
+      "city": "Chicago"
+    },
+    "otherInfo": "Focused on delivering projects on time and within budget.",
+    "website": "https://mikejonesprojects.com",
+    "date": "2025-01-25"
+  },
+  {
+    "email": "imthakursatyam@gmail.com",
+    "id": "67a385bdcbe8b02bd1d54324",
+    "title": "Data Scientist",
+    "desc": "Expert in machine learning, data analysis, and statistical modeling.",
+    "skills": [
+      "Python",
+      "R",
+      "SQL",
+      "TensorFlow",
+      "Data Visualization"
+    ],
+    "exp": [
+      "4 years in data science",
+      "Worked with large datasets",
+      "Experience in predictive modeling"
+    ],
+    "address": {
+      "street": "101 Maple Ave",
+      "city": "Austin",
+      "state": "TX",
+      "zip": "73301"
+    },
+    "otherInfo": "Passionate about making data-driven decisions.",
+    "website": "https://emilydata.com",
+    "date": "2025-02-02"
+  },
+  {
+    "email": "imthakursatyam@gmail.com",
+    "id": "67a385bdcbe8b02bd1d54325",
+    "title": "Backend Developer",
+    "desc": "Backend developer with expertise in API development and database design.",
+    "skills": [
+      "Node.js",
+      "MongoDB",
+      "REST APIs",
+      "GraphQL",
+      "Docker"
+    ],
+    "exp": [
+      "6 years in backend development",
+      "Designed APIs for e-commerce platforms",
+      "Built scalable microservices"
+    ],
+    "address": {
+      "street": "202 Birch Dr",
+      "city": "Los Angeles",
+      "state": "CA",
+      "zip": "90001"
+    },
+    "otherInfo": "Always looking for opportunities to improve application performance.",
+    "website": "https://robertbackenddev.com",
+    "date": "2025-02-04"
+  },
+  {
+    "email": "imthakursatyam@gmail.com",
+    "id": "67a385bdcbe8b02bd1d54326",
+    "title": "Marketing Specialist",
+    "desc": "Marketing expert with a focus on digital marketing strategies and brand management.",
+    "skills": [
+      "SEO",
+      "Social Media",
+      "Google Analytics",
+      "Content Marketing",
+      "Email Campaigns"
+    ],
+    "exp": [
+      "7 years in digital marketing",
+      "Managed SEO for large brands",
+      "Experience in email marketing campaigns"
+    ],
+    "address": {
+      "street": "303 Cedar Blvd",
+      "city": "Miami",
+      "state": "FL",
+      "zip": "33101"
+    },
+    "otherInfo": "Strong communicator with a passion for building brand awareness.",
+    "website": "https://lisabrownmarketing.com",
+    "date": "2025-01-15"
+  },
+  {
+    "email": "imthakursatyam@gmail.com",
+    "id": "67a385bdcbe8b02bd1d54327",
+    "title": "DevOps Engineer",
+    "desc": "DevOps engineer focused on automating infrastructure and continuous integration.",
+    "skills": [
+      "Kubernetes",
+      "Terraform",
+      "CI/CD",
+      "AWS",
+      "Linux"
+    ],
+    "exp": [
+      "5 years in DevOps",
+      "Automated infrastructure for cloud-based applications",
+      "Implemented CI/CD pipelines"
+    ],
+    "address": {
+      "street": "404 Elm St",
+      "city": "Seattle",
+      "state": "WA",
+      "zip": "98101"
+    },
+    "otherInfo": "Enjoys optimizing workflows for development teams.",
+    "website": "https://daviddevops.com",
+    "date": "2025-01-10"
+  },
+  {
+    "email": "imthakursatyam@gmail.com",
+    "id": "67a385bdcbe8b02bd1d54328",
+    "title": "Business Analyst",
+    "desc": "Experienced business analyst skilled in data collection, analysis, and reporting.",
+    "skills": [
+      "Data Analysis",
+      "Excel",
+      "Power BI",
+      "Business Intelligence",
+      "SQL"
+    ],
+    "exp": [
+      "6 years in business analysis",
+      "Worked with cross-functional teams",
+      "Created actionable reports for stakeholders"
+    ],
+    "address": {
+      "street": "505 Willow Ave",
+      "city": "Denver",
+      "state": "CO",
+      "zip": "80202"
+    },
+    "otherInfo": "Detail-oriented and results-driven.",
+    "website": "https://lilydavisanalyst.com",
+    "date": "2025-02-01"
+  },
+  {
+    "email": "imthakursatyam@gmail.com",
+    "id": "67a385bdcbe8b02bd1d54329",
+    "title": "Frontend Developer",
+    "desc": "Frontend developer with a passion for creating beautiful and responsive user interfaces.",
+    "skills": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "React",
+      "Vue.js"
+    ],
+    "exp": [
+      "4 years in frontend development",
+      "Specialized in responsive web design",
+      "Worked on e-commerce websites"
+    ],
+    "address": {
+      "street": "606 Aspen Rd",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02110"
+    },
+    "otherInfo": "Loves working on design-driven projects.",
+    "website": "https://charlesfrontenddev.com",
+    "date": "2025-01-18"
+  },
+  {
+    "email": "imthakursatyam@gmail.com",
+    "id": "67a385bdcbe8b02bd1d5432a",
+    "title": "HR Manager",
+    "desc": "HR manager with a focus on talent acquisition and employee relations.",
+    "skills": [
+      "Recruitment",
+      "Employee Engagement",
+      "Conflict Resolution",
+      "Payroll",
+      "Training & Development"
+    ],
+    "exp": [
+      "9 years in HR management",
+      "Experience with both large and small organizations",
+      "Developed employee wellness programs"
+    ],
+    "address": {
+      "street": "707 Pine St",
+      "city": "Dallas",
+      "state": "TX",
+      "zip": "75201"
+    },
+    "otherInfo": "Passionate about fostering a positive workplace culture.",
+    "website": "https://oliviahr.com",
+    "date": "2025-01-25"
+  }
+]
