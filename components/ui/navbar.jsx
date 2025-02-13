@@ -114,6 +114,7 @@ export default function WithSubnavigation() {
                 rounded={'full'}
                 variant={'link'}
                 cursor={'pointer'}
+                onClick={currRole == "FREELANCER" ? () => router.push("/freelancer/user/userProfile") : () => router.push("/recruiter/profile")}
                 minW={0}>
                 <Avatar
                   size={'sm'}
