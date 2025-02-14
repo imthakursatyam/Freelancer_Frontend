@@ -114,7 +114,6 @@ export default function WithSubnavigation() {
                 rounded={'full'}
                 variant={'link'}
                 cursor={'pointer'}
-                onClick={currRole == "FREELANCER" ? () => router.push("/freelancer/user/userProfile") : () => router.push("/recruiter/profile")}
                 minW={0}>
                 <Avatar
                   size={'sm'}
@@ -124,7 +123,7 @@ export default function WithSubnavigation() {
                 />
               </MenuButton>
               <MenuList p={2}>
-                <MenuItem className='hover:text-green-400 rounded-md' _hover={{ bg: useColorModeValue('green.50', 'gray.900') }} >Profile
+                <MenuItem onClick={currRole == "FREELANCER" ? () => router.push("/freelancer/user/userProfile") : () => router.push("/recruiter/user/userProfile")} className='hover:text-green-400 rounded-md' _hover={{ bg: useColorModeValue('green.50', 'gray.900') }} >Profile
                 <Flex
                 transition={'all .2s ease'}
                 className='hover:opacity-100 hover:transform hover:translate-x-0 transition-all'
@@ -368,7 +367,7 @@ const NAV_ITEMS = [
       {
         label: 'Find a Freelancer',
         subLabel: 'List of top rated active freelancers',
-        href: '/recruiter/searchFreelancer',
+        href: '/recruiter/freelancer/searchFreelancer',
       }
     ],
     role:"RECRUITER"

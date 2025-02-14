@@ -170,7 +170,7 @@ export default function Example({ profile }) {
                 <div className='flex items-center '>
                 <Avatar size='xl' name='Christian Nwamba' src='https://bit.ly/code-beast' />{' '}
                     <Heading className='inline ml-4' size='lg' fontSize='50px'>
-                        User Profile
+                        {basic.name}
                     </Heading>
                 </div>
                     <Link className='bg-green-500 p-2 px-3 text-white rounded-md font-bold text-sm' href="/freelancer/user/updateProfile">update Profile</Link>

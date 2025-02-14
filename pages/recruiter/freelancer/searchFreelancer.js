@@ -158,7 +158,7 @@ export async function getServerSideProps(context) {
     });
 
     let data = await response.json();
-    console.log(data)
+
     if(!data.success) throw new Error("No Freelancers");
     
     return {
@@ -167,7 +167,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (error) {
-   console.log(error)
+
     return {
       props: {
         freelancers: [],
@@ -185,7 +185,7 @@ export default function ThreeTierPricing({freelancers}) {
 
   const router = useRouter();
   const routeToProfile = (id) => {
-    router.push("/freelancer/profile/"+id);
+    router.push("/recruiter/freelancer/profile/"+id);
   }
   const handleSearchChange =  (event) => {
     console.log(event.target.value)
