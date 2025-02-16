@@ -18,18 +18,87 @@ import {
   MenuList,
   MenuItem,
   MenuDivider,
-  Avatar
+  Avatar,
+  ButtonGroup
 } from '@chakra-ui/react'
 import {
   HamburgerIcon,
   CloseIcon,
   ChevronDownIcon,
   ChevronRightIcon,
+  BellIcon
 } from '@chakra-ui/icons'
 import Link from "next/link";
 import { useSelector, useDispatch } from 'react-redux';
 import { setCurrRole, setLogin } from '@/store/slices/authState';
 import { useRouter } from 'next/router';
+import useWebSocket from '../../services/webSocket.js';
+import React from 'react';
+import {
+  PopoverHeader,
+  PopoverBody,
+  PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverAnchor,
+} from '@chakra-ui/react'
+import { FaRegBell } from "react-icons/fa";
+import { MdDeleteOutline } from "react-icons/md";
+
+
+const Notifications = () => {
+  const initialFocusRef = React.useRef();
+  const notifications = useSelector((state)=> state.Notification);
+  const webSocketUrl = 'ws://localhost:8080/ws/notifications';
+  const {removeNt} = useWebSocket(webSocketUrl);
+
+
+  const handleRemoveNotification = (Notification) => {
+    removeNt(Notification);
+  };
+
+  return (<>
+    <Popover
+      initialFocusRef={initialFocusRef}
+      placement='bottom'
+      closeOnBlur={false}
+     
+    >
+      <PopoverTrigger>
+        <FaRegBell className='mx-4'/>
+      </PopoverTrigger>
+      <PopoverContent className='min-h-60 ' color='white' bg='blue.800' borderColor='blue.800'>
+        <PopoverHeader className='' pt={4} bg= 'blue.900' fontWeight='bold' border='0'>
+          Notifications
+        </PopoverHeader>
+        <PopoverArrow bg='blue.800' />
+        <PopoverCloseButton className='pt-4' />
+        {(notifications && notifications.length> 0) && notifications.map((nt, idx) => {
+          return  <div key={idx} className='flex flex-row p-2 border-b mx-2 '>
+          <div className='text-sm min-w-[90%] max-w-[90%]  px-2 my-1'>
+            {nt.message}
+        </div>
+        <div className='flex justify-end  items-center'>
+          <MdDeleteOutline onClick={()=> handleRemoveNotification(nt)} className='text-red-500 text-xl cursor-pointer' /> 
+        </div>
+        </div>
+        })}
+        {(!notifications || notifications.length == 0) && <div className='flex flex-row p-2 pb-4 '>
+          <div className='text-sm w-full px-2 my-1 '>
+            No notifications
+        </div>
+        </div>}
+      </PopoverContent>
+    </Popover>
+  </>)
+}
+
+
+
+
+
+
+
 
 
 
@@ -44,6 +113,10 @@ export default function WithSubnavigation() {
     dispatch(setCurrRole({val: ""}));
     router.push("/");
   };
+
+  
+
+
   return (
     <Box className=''>
       <Flex
@@ -80,6 +153,7 @@ export default function WithSubnavigation() {
           </Link>
 
           <Flex ml="auto" mr={6} display={{ base: 'none', md: 'flex' }} justify={'center'} align={'center'}>
+          {authStatus && <Notifications />} 
             <DesktopNav />
           </Flex>
         </Flex>
@@ -89,7 +163,7 @@ export default function WithSubnavigation() {
           justify={'flex-end'}
           direction={'row'}
           spacing={6}>
-
+          
           {!authStatus && <Link href="/auth/login"><Button mt={2.5} fontSize={'sm'} fontWeight={400} variant={'link'} href={'#'}>
             Sign In
           </Button></Link>}

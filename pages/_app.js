@@ -3,7 +3,12 @@ import { Provider as UiProvider } from "@/components/ui/provider";
 import { Provider as StateProvider} from "react-redux";
 import {Navbar, Footer} from "@/components/ui/export";
 import store from "../store/index.js";
+import React from "react";
+
+
+
 export default function App({ Component, pageProps }) {
+  
 
   return <StateProvider store={store}>
     <UiProvider>
