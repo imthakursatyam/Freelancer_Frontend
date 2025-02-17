@@ -420,12 +420,12 @@ const NAV_ITEMS = [
       {
         label: 'Explore',
         subLabel: 'Find your dream job from our top recruiters',
-        href: '/freelancer/exploreJobs',
+        href: '/freelancer/jobpost/exploreJobs',
       },
       {
         label: 'Applied Jobposts',
         subLabel: 'Manage your applied jobposts',
-        href: '/freelancer/appliedJobpost',
+        href: '/freelancer/jobpost/appliedJobpost',
       },
       {
         label: 'Search Job',
