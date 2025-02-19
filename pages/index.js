@@ -11,7 +11,7 @@ export default function Home(){
          credentials: "include"
        });
        
-       let data = await response.json();
+       let data = await response.text();
        console.log(data)
 }
   return <>

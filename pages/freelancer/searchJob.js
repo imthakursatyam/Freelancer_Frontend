@@ -66,7 +66,10 @@ export default function ThreeTierPricing({jobPosts}) {
   const [isSearching, setSearching] = React.useState(false);
   const [searchedJobPosts, setSearchedJobPosts] = React.useState([]);
   
-    
+  const debouncing = (searchFunction) => {
+    const timer = setTimeout(searchFunction, 500);
+    clearTimeout();
+  }
     const handleSearchChange =  (event) => {
       console.log(event.target.value)
       if (event.target.value.length >= 3) {

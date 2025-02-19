@@ -477,7 +477,7 @@ export default function register() {
        "role":"FREELANCER"
      });
      
-     let response = await fetch("http://localhost:8080/login", { 
+     let response = await fetch("http://localhost:8080/login/freelancer", { 
        method: "POST",
        body: bodyContent,
        headers: headersList,
@@ -510,7 +510,7 @@ export default function register() {
        "role":"RECRUITER"
      });
      
-     let response = await fetch("http://localhost:8080/login", { 
+     let response = await fetch("http://localhost:8080/login/recruiter", { 
        method: "POST",
        body: bodyContent,
        headers: headersList, 
