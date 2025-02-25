@@ -22,6 +22,7 @@ import {
   FormControl
 } from '@chakra-ui/react'
 import React from 'react'
+import { useToast } from '@chakra-ui/react'
 
 const avatars = [
   {
@@ -68,7 +69,7 @@ const Blur = (props) => {
 }
 
 
-const FreelancerLogin = ({tab, setTab, handleOnSubmit, form, handleOnChange}) => {
+const FreelancerLogin = ({tab, setTab, handleOnSubmit, form, handleOnChange, spin}) => {
   return (<Box position={'relative'}>
     <Container
       as={SimpleGrid}
@@ -205,6 +206,9 @@ const FreelancerLogin = ({tab, setTab, handleOnSubmit, form, handleOnChange}) =>
               <Text className="cursor-pointer" onClick={() => {setTab(["forgotPassword"])}} color={'blue.400'}>Forgot password?</Text>
             </Stack>
           <Button 
+            isLoading={spin}
+            loadingText="Signing In"
+            spinnerPlacement='end'
             type={"submit"}
             fontFamily={'heading'}
             mt={8}
@@ -215,7 +219,7 @@ const FreelancerLogin = ({tab, setTab, handleOnSubmit, form, handleOnChange}) =>
               bgGradient: 'linear(to-r, green.600,green.700)',
               boxShadow: 'xl',
             }}>
-            Submit
+            Sign In
           </Button>
           <Stack
               direction={{ base: 'column', sm: 'row' }}
@@ -240,7 +244,7 @@ const FreelancerLogin = ({tab, setTab, handleOnSubmit, form, handleOnChange}) =>
 )}
 
 
-const RecruiterLogin = ({tab, setTab, handleOnSubmit, form, handleOnChange}) => {
+const RecruiterLogin = ({tab, setTab, handleOnSubmit, form, handleOnChange, spin}) => {
   return (<Box position={'relative'}>
     <Container
       as={SimpleGrid}
@@ -377,6 +381,9 @@ const RecruiterLogin = ({tab, setTab, handleOnSubmit, form, handleOnChange}) => 
               <Text className="cursor-pointer" onClick={() => {setTab(["forgotPassword"])}} color={'blue.400'}>Forgot password?</Text>
             </Stack>
           <Button
+            isLoading={spin}
+            loadingText="Signing In"
+            spinnerPlacement='end'
             type={"submit"}
             fontFamily={'heading'}
             mt={8}
@@ -387,7 +394,7 @@ const RecruiterLogin = ({tab, setTab, handleOnSubmit, form, handleOnChange}) => 
               bgGradient: 'linear(to-r, green.600,green.700)',
               boxShadow: 'xl',
             }}>
-            Submit
+            Sign In
           </Button>
           <Stack
               direction={{ base: 'column', sm: 'row' }}
@@ -457,77 +464,134 @@ const ForgotPassword = ({tab, setTab, handleForgotPassword}) => {
     </Flex>
   )
 }
+
+
+
 export default function register() {
+  const [spin, setSpin] = React.useState(false);
   const [tab, setTab] = React.useState("freelancer");
   const [form, setForm] = React.useState({
      email: "",
      password:""
    })
    const dispatch = useDispatch();
+   const toast = useToast();
+
 
    const handleOnSubmitFreelancer = async (e) => {
-     e.preventDefault();    
-     let headersList = {
-      "Accept": "application/json",
-      "Content-Type": "application/json"
+     try {
+      e.preventDefault();    
+      setSpin(true);
+      let headersList = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+       }
+       let bodyContent = JSON.stringify({
+         "email":form.email,
+         "password":form.password,
+         "role":"FREELANCER"
+       });
+       
+       let response = await fetch("http://localhost:8080/login/freelancer", { 
+         method: "POST",
+         body: bodyContent,
+         headers: headersList,
+         credentials: "include"
+       });
+       
+       let data = await response.json();
+       setSpin(false);
+       if (data.success) {
+        toast({
+          title: 'Success',
+          description: data.message,
+          status: 'success',
+          duration: 4000,
+          isClosable: true,
+        })
+        dispatch(setLogin({val:true}));
+        dispatch(setCurrRole({val:"FREELANCER"}));
+        Router.push("/");
+      } else {
+        toast({
+          title: `${data.message}`,
+          status: "error",
+          isClosable: true,
+          duration: 4000,
+          isClosable: true
+        })
+      }
+     } catch (error) {
+      setSpin(false);
+      toast({
+        title: "Some Error Occurred",
+        status: "error",
+        isClosable: true,
+        duration: 4000,
+        isClosable: true
+      })
      }
-     let bodyContent = JSON.stringify({
-       "email":form.email,
-       "password":form.password,
-       "role":"FREELANCER"
-     });
-     
-     let response = await fetch("http://localhost:8080/login/freelancer", { 
-       method: "POST",
-       body: bodyContent,
-       headers: headersList,
-       credentials: "include"
-     });
-     
-     let data = await response.json();
-     console.log(data)
-     console.log(data.message)
-     if (data.success) {
-      alert(data.message);
-      dispatch(setLogin({val:true}));
-      dispatch(setCurrRole({val:"FREELANCER"}));
-      Router.push("/");
-    } else {
-      alert(data.message+", Please try again");
-    }
+   
    }
 
    const handleOnSubmitRecruiter = async (e) => {
-    e.preventDefault();   
-    let headersList = {
-      "Accept": "application/json",
-      "Content-Type": "application/json"
-     }
-     
-     let bodyContent = JSON.stringify({
-       "email":form.email,
-       "password":form.password,
-       "role":"RECRUITER"
-     });
-     
-     let response = await fetch("http://localhost:8080/login/recruiter", { 
-       method: "POST",
-       body: bodyContent,
-       headers: headersList, 
-       credentials: "include"
-     });
-     
-     let data = await response.json();
-     if (data.success) {
-      alert(data.message);
-      dispatch(setLogin({val:true}));
-      dispatch(setCurrRole({val:"RECRUITER"}));
-      Router.push("/");
-    } else {
-      alert(data.message+", Please try again");
+
+    try {
+      e.preventDefault();   
+      setSpin(true);
+      let headersList = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+       }
+       
+       let bodyContent = JSON.stringify({
+         "email":form.email,
+         "password":form.password,
+         "role":"RECRUITER"
+       });
+       
+       let response = await fetch("http://localhost:8080/login/recruiter", { 
+         method: "POST",
+         body: bodyContent,
+         headers: headersList, 
+         credentials: "include"
+       });
+       
+       let data = await response.json();
+       setSpin(false);
+       if (data.success) {
+        toast({
+          title: 'Success',
+          description: data.message,
+          status: 'success',
+          duration: 4000,
+          isClosable: true,
+        })
+        dispatch(setLogin({val:true}));
+        dispatch(setCurrRole({val:"RECRUITER"}));
+        Router.push("/");
+      } else {
+        toast({
+          title: `${data.message}`,
+          status: "error",
+          isClosable: true,
+          duration: 4000,
+          isClosable: true
+        })
+      }
+    } catch (error) {
+      setSpin(false);
+      toast({
+        title: "Some Error Occurred",
+        status: "error",
+        isClosable: true,
+        duration: 4000,
+        isClosable: true
+      })
     }
-     
+    
    }
+
    const handleOnChange = (e) => {
      setForm({...form, [e.target.name]:e.target.value});
    }
@@ -539,8 +603,8 @@ export default function register() {
 
   return (
     <>
-    {tab == "freelancer" && <FreelancerLogin tab={tab} setTab={setTab} handleOnSubmit={handleOnSubmitFreelancer} form={form} handleOnChange={handleOnChange}/>}
-    {tab == "recruiter" && <RecruiterLogin tab={tab} setTab={setTab} handleOnSubmit={handleOnSubmitRecruiter} form={form} handleOnChange={handleOnChange}/>}
+    {tab == "freelancer" && <FreelancerLogin tab={tab} setTab={setTab} handleOnSubmit={handleOnSubmitFreelancer} form={form} handleOnChange={handleOnChange} spin={spin}/>}
+    {tab == "recruiter" && <RecruiterLogin tab={tab} setTab={setTab} handleOnSubmit={handleOnSubmitRecruiter} form={form} handleOnChange={handleOnChange} spin={spin}/>}
     {tab == "forgotPassword" && <ForgotPassword tab={tab} setTab={setTab} handleForgotPassword={handleForgotPassword}/>}
     </>
   );

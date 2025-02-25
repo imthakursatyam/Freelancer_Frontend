@@ -5,14 +5,35 @@ import {Navbar, Footer} from "@/components/ui/export";
 import store from "../store/index.js";
 import React from "react";
 import AuthValidator from "@/services/AuthValidator.js";
+import { useRouter } from "next/router.js";
+import PageSpinner from "@/components/custom/PageSpinner.js";
+
 export default function App({ Component, pageProps }) {
+  const [progress, setProgress] = React.useState(false);
+  const router = useRouter();
+
+  React.useEffect(() => {
+    router.events.on("routeChangeStart", () => {
+      setProgress(true);
+    });
+    router.events.on("routeChangeComplete", () => {
+      setProgress(false);
+    });
+  }, []);
  
-  return <StateProvider store={store}>
-    <AuthValidator/>
+
+
+  return <>
+  
+    <StateProvider store={store}>
     <UiProvider>
-    <Navbar/>
+     <Navbar/>
+    <PageSpinner Loading={progress} />
+    <AuthValidator/>
+
     <Component {...pageProps} />
     <Footer/>
     </UiProvider>
     </StateProvider>
+    </>
 }

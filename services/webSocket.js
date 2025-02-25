@@ -41,21 +41,18 @@ const useWebSocket = (url) => {
   }, [url]);
   
 
-  /*const removeNotification = React.useCallback(
+  const removeNt = React.useCallback(
     (message) => {
       if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify(message)); // Send the message to the WebSocket server
         console.log('Message sent:', message);
+        dispatch(removeNotification({id: message.id}));
       } else {
         console.log('WebSocket is not open. Cannot send message.');
       }
     },
     [socket] // This function depends on the socket instance
-  );*/
-
-  const removeNt = (message) => {
-    dispatch(removeNotification({id: message.id}));
-  }
+  );
 
   return {removeNt};
 };

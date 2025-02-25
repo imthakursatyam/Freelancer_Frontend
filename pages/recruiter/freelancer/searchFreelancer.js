@@ -14,7 +14,10 @@ import {
   ListIcon,
   Button,
   Wrap,
-  WrapItem
+  WrapItem, 
+  SkeletonText, 
+  SkeletonCircle,
+  Skeleton
 } from '@chakra-ui/react'
 import React from 'react';
 import { FaCheckCircle } from 'react-icons/fa'
@@ -32,15 +35,15 @@ import cookie from "cookie";
   return (
     <Center py={6}>
       <Box
-        maxW={'320px'}
+        maxW={'350px'}
+        minW={"350px"}
         w={'full'}
         bg={useColorModeValue('white', 'gray.900')}
-        boxShadow={'2xl'}
         rounded={'lg'}
         p={6}
         textAlign={'center'}>
         <Avatar
-          size={'xl'}
+          size={'lg'}
           src={profile.profileImg}
           mb={4}
           pos={'relative'}
@@ -70,12 +73,14 @@ import cookie from "cookie";
          
         </Text>
 
+       
+
         <Stack display={"flex"} align="center" py={5}>
           <Wrap maxWidth={"95%"} mt={6} spacing={5} overflow={"hidden"}>
-            <WrapItem display={"flex"}>
+            <WrapItem>
             {
              profile.skills && profile.skills.map((skill, index) => {
-              return <Badge key={index}
+              return <Badge display={"block"} className='mx-2' key={index}
               px={2}
               py={1}
               bg={useColorModeValue('gray.50', 'gray.800')}
@@ -177,40 +182,71 @@ export async function getServerSideProps(context) {
  
 }
 
-
+const ProfileSkeleton = () => {
+  return <>
+  <Box maxW={"350px"} minH={"400px"} margin={5} padding='6' boxShadow='lg' bg='white'>
+  <SkeletonCircle mx={"auto"} size='70' />
+  <Skeleton className='mx-auto w-4/5' mt={5} mb={2} height='3'/> 
+  <Skeleton className='mx-auto w-4/5' mb={1}  height='2'/> 
+  <SkeletonText mt='6' className='mx-auto' noOfLines={4} spacing='2' skeletonHeight='3' />
+   <div className='flex mt-8'>
+   <Skeleton className='mx-auto w-1/4'  height='5'/> 
+   <Skeleton className='mx-auto w-1/4'  height='5'/> 
+   <Skeleton className='mx-auto w-1/4'  height='5'/> 
+   </div>
+   <div className='flex mt-8'>
+   <Skeleton className='mx-auto w-5/12' rounded={"2xl"}  height='8'/> 
+   <Skeleton className='mx-auto w-5/12 rounded-md' rounded={"2xl"} height='8'/> 
+   </div>
+  </Box>
+</>
+}
 export default function ThreeTierPricing({freelancers}) {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [isSearching, setSearching] = React.useState(false);
   const [profiles, setProfiles] = React.useState([]);
+  const [isLoading, setLoading] = React.useState(false);
 
   const router = useRouter();
   const routeToProfile = (id) => {
     router.push("/recruiter/freelancer/profile/"+id);
   }
-  const handleSearchChange =  (event) => {
-    console.log(event.target.value)
-    if (event.target.value.length >= 3) {
-       setSearching(true);
-       handleSearch(event.target.value);
-       // is user is already typing  no need to change state
-    }
+
+  React.useEffect(() => {
+      const handler = setTimeout(() => {
+        
+        handleSearch(searchTerm);
+      }, 500); // 500ms delay
+  
+      return () => {
+        clearTimeout(handler); // Clean up the timeout if the component re-renders or the query changes
+      };
+    }, [searchTerm]); // Effect runs whenever `query` changes
+
+  const handleSearchChange =  (event) => { 
     setSearchTerm(event.target.value);
-    if (event.target.value.length <= 2) setSearching(false); 
   };
   const handleSearch = async (query) => {
-    let headersList = {
-      "Accept": "application/json",
-      "Content-Type": "application/json"
-     }
-    let response = await fetch("http://localhost:8080/recruiter/searchFreelancer", { 
-      method: "POST",
-      body: JSON.stringify({"query": query}),
-      headers: headersList,
-      credentials: "include"
-    });
-
-    let data = await response.json();
-    if (data.success) setProfiles(data.profiles)
+    setLoading(true);
+    try {
+      let headersList = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+       }
+      let response = await fetch("http://localhost:8080/recruiter/searchFreelancer", { 
+        method: "POST",
+        body: JSON.stringify({"query": query}),
+        headers: headersList,
+        credentials: "include"
+      });
+  
+      let data = await response.json();
+      if (data.success) setProfiles(data.profiles);
+    } catch (error) {
+      
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -239,21 +275,25 @@ export default function ThreeTierPricing({freelancers}) {
         />
       </InputGroup>
     </Box>
-      <Stack display={"flex"} align="center" py={10}>
-        <Wrap spacing={10} justify="center">
-        {(isSearching && profiles) && (profiles).map((profile, index) => (
-            <WrapItem key={index} >
+    <div className="mx-auto  grid max-w-2xl grid-cols-1 lg:mt-8 lg:pt-8 border-t border-gray-300  sm:mt-16 sm:pt-16 lg:mx-auto lg:max-w-[90%] lg:grid-cols-3 ">
+  
+        {(!isLoading && profiles) && (profiles).map((profile, index) => (
+            
               <SocialProfileSimple profile={profile} routeToProfile={routeToProfile} />
-            </WrapItem>
+            
           ))}
-        {(freelancers && !isSearching) && (freelancers).map((profile, index) => (
-            <WrapItem key={index}>
+        {((freelancers && !isLoading) && searchTerm.length == 0 ) && (freelancers).map((profile, index) => (
+            
               <SocialProfileSimple profile={profile} routeToProfile={routeToProfile} />
-            </WrapItem>
+            
           ))}
-        </Wrap>
-      </Stack>
-    </Box>
+
+        { isLoading && [0,1,2,3,4,5,6,7,8].map((item, idx) => {
+          return <ProfileSkeleton/>
+        })}
+     
+        </div>
+      </Box>
   )
 }
 const freelancer = [

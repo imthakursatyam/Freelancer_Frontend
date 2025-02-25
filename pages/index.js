@@ -1,5 +1,10 @@
 import {Hero, Footer, Static1, Static2, Static3, Static4} from "../components/ui/export.js";
+import { useRouter } from "next/router.js";
+import PageSpinner from "@/components/custom/PageSpinner.js";
+import React from "react";
 export default function Home(){
+ 
+  
   const startFetch = async () => {
     let headersList = {
         "Accept": "application/json",
@@ -15,9 +20,7 @@ export default function Home(){
        console.log(data)
 }
   return <>
-  <div>
-        <button onClick={startFetch}>fetch</button>
-    </div>
+ 
   <Hero/>
   <Static2/>
   <Static1/>

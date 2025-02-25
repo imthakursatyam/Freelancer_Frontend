@@ -41,6 +41,7 @@ import {
   PopoverArrow,
   PopoverCloseButton,
   PopoverAnchor,
+
 } from '@chakra-ui/react'
 import { FaRegBell } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
@@ -51,27 +52,31 @@ const Notifications = () => {
   const notifications = useSelector((state) => state.Notification);
   const webSocketUrl = 'ws://localhost:8080/ws/notifications';
   const { removeNt } = useWebSocket(webSocketUrl);
-
+  const { isOpen, onToggle, onClose } = useDisclosure()
 
   const handleRemoveNotification = (Notification) => {
     removeNt(Notification);
   };
 
+
+  // Handle mouse enter to open the popover
+ 
+
   return (<>
     <Popover
-      initialFocusRef={initialFocusRef}
-      placement='bottom'
+      placement='bottom-start'
       closeOnBlur={false}
-
+      isOpen={isOpen}
+      onClose={onClose}
     >
-      <PopoverTrigger>
-        <FaRegBell className='mx-4' />
+      <PopoverTrigger >
+        <FaRegBell onMouseOver={onToggle}  className='mx-4' />
       </PopoverTrigger>
-      <PopoverContent className='min-h-60 ' color='white' bg='blue.800' borderColor='blue.800'>
-        <PopoverHeader className='' pt={4} bg='blue.900' fontWeight='bold' border='0'>
+      <PopoverContent className='min-h-60 rounded p-2' color='black' bg='gray.50' borderColor='white'>
+        <PopoverHeader className='border-b-2' pt={4} bg='gray.50' fontWeight='bold'>
           Notifications
         </PopoverHeader>
-        <PopoverArrow bg='blue.800' />
+        <PopoverArrow bg='white' />
         <PopoverCloseButton className='pt-4' />
         {(notifications && notifications.length > 0) && notifications.map((nt, idx) => {
           return <div key={idx} className='flex flex-row p-2 border-b mx-2 '>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from '@chakra-ui/react'
-import { Card, CardHeader, CardBody, Heading, Stack, StackDivider, Box, Text, Tag, TagLabel, TagCloseButton, Highlight, Flex, Badge } from '@chakra-ui/react'
+import { Card, CardHeader, CardBody, Heading, Stack, StackDivider, Box, Text, Tag, TagLabel, TagCloseButton, Highlight, Flex, Badge, useToast } from '@chakra-ui/react'
 import { MdOutlineDelete, MdEditDocument } from "react-icons/md";
 import Link from "next/link";
 import cookie from "cookie";
@@ -60,93 +60,17 @@ export async function getServerSideProps(context) {
     }
 
 } 
-/*
-
-const applications = [{
-    freelancerId: "",
-    message: "this is a message",
-    date: "2025/02/21"
-}, {
-    freelancerId: "",
-    message: "this is a message",
-    date: "2025/02/21"
-}, {
-    freelancerId: "",
-    message: "this is a message",
-    date: "2025/02/21"
-}]
-
-const jobPosts = [
-    {
-        email: "imthakursatyam@gmail.com",
-        id: "67a385bdcbe8b02bd1d54322",
-        title: "UX/UI Designer",
-        desc: "Experienced designer creating intuitive and user-friendly interfaces.",
-        skills: [
-            "javascript",
-            "reactjs",
-            "figma",
-            "canva"
-        ],
-        exp: [
-            "8 years in design",
-            "Led design teams for large projects",
-            "Focus on user-centered design"
-        ],
-        address: {
-            country: "Canada",
-            state: "CA",
-            pincode: "124512",
-            landmark: "High Streets",
-            city: "San Francisco"
-        },
-        otherInfo: "Enjoys collaborating with developers to create seamless experiences.",
-        website: "https://sarahsmithdesigns.com",
-        date: null,
-        applicationList: [
-            {
-                id: "67b35f2c061d85283554c86f",
-                recruiterEmail: "imthakursatyam@gmail.com",
-                freelancerEmail: "imthakursatyam@gmail.com",
-                freelancerMessage: "I applied to this jobpost",
-                date: "2025-02-17 21:39:16 +0530"
-            }
-        ]
-    },
-    {
-        email: null,
-        id: "67a385bdcbe8b02bd1d54323",
-        title: "Project Manager",
-        desc: "Project manager with expertise in agile methodologies and cross-functional teams.",
-        skills: null,
-        exp: [
-            "10 years managing software projects",
-            "Certified ScrumMaster",
-            "Experienced with international teams"
-        ],
-        address: {
-            state: "IL",
-            pincode: "5455555",
-            city: "Chicago"
-        },
-        otherInfo: "Focused on delivering projects on time and within budget.",
-        website: "https://mikejonesprojects.com",
-        date: null,
-        applicationList: []
-    }
-]
-    */
 
 function ProfileModal({ isOpen, onClose, profile }) {
 
     return (
         <>
-            <Modal onClose={onClose} size={"full"} isOpen={isOpen}>
+            <Modal onClose={onClose} scrollBehavior='inside' size={"xl"} isOpen={isOpen}>
                 <ModalOverlay />
                 <ModalContent >
                     <ModalHeader>Profile</ModalHeader>
                     <ModalCloseButton />
-                    <ModalBody overflowY={"scroll"} >
+                    <ModalBody>
                     {profile && ProfilePage({fetchedProfile: profile})}
                     {!profile && <div>Loading please wait</div>}
                     </ModalBody>
@@ -309,27 +233,46 @@ export default function jobposts({jobPosts}) {
     const [profile, setProfile] = React.useState({});
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [id, setId] = React.useState("");
+    const toast = useToast();
     const viewProfile = (id) => {
         setId(id);
         fetchProfile(id);
     }
     const fetchProfile = async (userId) => {
-        let headersList = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
+        try {
+            let headersList = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            }
+            let response = await fetch("http://localhost:8080/recruiter/getFreelancerProfile", {
+                method: "POST",
+                headers: headersList,
+                credentials: "include",
+                body: JSON.stringify({ "id": userId })
+            });
+            let data = await response.json();
+            if (data.success) {
+                setProfile(data.profile);
+                onOpen();
+            } else {
+                toast({
+                    title: 'JobPost',
+                    description: "Unable to Get User Profile",
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                  })
+            }
+        } catch (error) {
+            toast({
+                title: 'JobPost',
+                description: "Unable to Get User Profile",
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+              })
         }
-        let response = await fetch("http://localhost:8080/recruiter/getFreelancerProfile", {
-            method: "POST",
-            headers: headersList,
-            credentials: "include",
-            body: JSON.stringify({ "id": userId })
-        });
-        let data = await response.json();
-        console.log(data)
-        if (data.success) {
-            setProfile(data.profile);
-            onOpen();
-        }
+        
     }
 
 

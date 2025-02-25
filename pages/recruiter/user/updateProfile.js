@@ -12,7 +12,8 @@ import {
     Input,
     Flex,
     Textarea,
-    Badge
+    Badge,
+    ButtonGroup
 } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
 import React from 'react'
@@ -73,7 +74,7 @@ export async function getServerSideProps(context) {
         });
 
         let data = await response.json();
-       
+
         if (!data.success) throw new Error("No Jobposts");
 
         return {
@@ -108,19 +109,18 @@ export default function ProfileUpdatePage({ profile }) {
         state: '',
         city: ""
     });
-
     const [lang, setLang] = React.useState([]);
     const [skill, setSkill] = React.useState([]);
+    const [spin, setSpin] = React.useState(false);
     const toast = useToast();
 
     React.useEffect(() => {
-        const { name = 'Unknown', contactMail = 'not-provided@example.com', bio = 'No bio provided', contactNumber = 'Not available', companyDescription="Unknown", companyName="Unknown", companyIndustry="Unknown",  companyLocation, websiteUrl="Not Provided"} = profile || {};
+        const { name = 'Unknown', contactMail = 'not-provided@example.com', bio = 'No bio provided', contactNumber = 'Not available', companyDescription = "Unknown", companyName = "Unknown", companyIndustry = "Unknown", companyLocation, websiteUrl = "Not Provided" } = profile || {};
         const { preferredLanguages = [], preferredSkills = [] } = profile || {};
-        const { addressLine="unknown", country='Unknown', state='Unknown', city='Unknown' } = companyLocation || {};
+        const { addressLine = "unknown", country = 'Unknown', state = 'Unknown', city = 'Unknown' } = companyLocation || {};
         setBasic({ name, contactMail, bio, contactNumber, addressLine, country, state, city, companyDescription, companyName, companyIndustry, websiteUrl, addressLine, country, state, city });
         setLang(preferredLanguages || []);
         setSkill(preferredSkills || []);
-       
     }, [])
 
     const basicOnChange = (e) => {
@@ -135,57 +135,70 @@ export default function ProfileUpdatePage({ profile }) {
 
     const handleOnSave = async (e) => {
         e.preventDefault();
+        setSpin(true);
+        try {
+            let headersList = {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
 
-        let headersList = {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-        }
+            let bodyContent = JSON.stringify({
+                "name": basic.name,  // Using name from state
+                "contactMail": basic.contactMail,  // Contact mail from state
+                "bio": basic.bio,  // Bio from state
+                "contactNumber": basic.contactNumber,  // Contact number from state  
+                "preferredSkills": skill,  // Skills array from state
+                "preferredLanguages": lang,  // Languages from state
+                "companyLocation": {
+                    "addressLine": basic.addressLine,  // Address from state
+                    "country": basic.country,  // Country from state
+                    "state": basic.state,  // State from state
+                    "city": basic.city  // City from state
+                },
+                "companyName": basic.companyName,
+                "companyDescription": basic.companyDescription,
+                "companyIndustry": basic.companyIndustry,
+                "websiteUrl": basic.websiteUrl
+            });
 
-        let bodyContent = JSON.stringify({
-            "name": basic.name,  // Using name from state
-            "contactMail": basic.contactMail,  // Contact mail from state
-            "bio": basic.bio,  // Bio from state
-            "contactNumber": basic.contactNumber,  // Contact number from state  
-            "preferredSkills": skill,  // Skills array from state
-            "preferredLanguages": lang,  // Languages from state
-            "companyLocation": {
-                "addressLine": basic.addressLine,  // Address from state
-                "country": basic.country,  // Country from state
-                "state": basic.state,  // State from state
-                "city": basic.city  // City from state
-            },
-            "companyName": basic.companyName,
-            "companyDescription": basic.companyDescription,
-            "companyIndustry": basic.companyIndustry,
-            "websiteUrl": basic.websiteUrl
-        });
+            let response = await fetch("http://localhost:8080/recruiter/updateProfile", {
+                method: "POST",
+                body: bodyContent,
+                headers: headersList,
+                credentials: "include"
+            });
 
-        let response = await fetch("http://localhost:8080/recruiter/updateProfile", {
-            method: "POST",
-            body: bodyContent,
-            headers: headersList,
-            credentials: "include"
-        });
+            let data = await response.json();
 
-        let data = await response.json();
-
-        if (data.success) {
+            if (data.success) {
+                toast({
+                    title: 'Profile',
+                    description: data.message,
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            } else {
+                toast({
+                    title: 'Profile',
+                    description: data.message,
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            }
+        } catch (error) {
             toast({
                 title: 'Profile',
-                description: data.message,
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
-            })
-        } else {
-            toast({
-                title: 'Profile',
-                description: data.message,
+                description: "unable to update profile",
                 status: 'error',
                 duration: 3000,
                 isClosable: true,
             })
+        } finally {
+            setSpin(false);
         }
+
     }
 
     return (
@@ -357,7 +370,7 @@ export default function ProfileUpdatePage({ profile }) {
                                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                 />
                             </div>
-                        
+
                         </div>
                         <div className="sm:col-span-4">
                             <label htmlFor="companyName" className="block text-sm/6 font-medium text-gray-900">
@@ -373,7 +386,7 @@ export default function ProfileUpdatePage({ profile }) {
                                     placeholder='Please Enter Your Company Name'
                                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                 />
-                                </div>
+                            </div>
                         </div>
                         <div className="col-span-full">
                             <label htmlFor="companyDescription" className="block text-sm/6 font-medium text-gray-900">
@@ -389,8 +402,8 @@ export default function ProfileUpdatePage({ profile }) {
                                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                     defaultValue={''}
                                 />
-                                </div>
                             </div>
+                        </div>
                         <div className="sm:col-span-4">
                             <label htmlFor="companyIndustry" className="block text-sm/6 font-medium text-gray-900">
                                 Industry
@@ -405,8 +418,8 @@ export default function ProfileUpdatePage({ profile }) {
                                     placeholder='Please Enter Your Company Industry'
                                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                 />
-                                </div>
-                            
+                            </div>
+
                         </div>
                         <div>
                             <label htmlFor="website" className="block text-sm/6 font-medium text-gray-900">
@@ -424,7 +437,7 @@ export default function ProfileUpdatePage({ profile }) {
                                 />
                             </div>
                         </div>
-                       
+
                         <div>
 
                         </div>
@@ -451,14 +464,21 @@ export default function ProfileUpdatePage({ profile }) {
                 </div>
             </div>
 
-            <div className="mt-6 flex items-center justify-end gap-x-6">
-                <button
-                    onClick={(e) => { handleOnSave(e) }}
-                    className="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-green-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
-                >
-                    Save
-                </button>
-            </div>
+            <ButtonGroup mt="5%" w="100%">
+                <Flex w="100%" justifyContent="space-between">
+                    <Button
+                        isLoading={spin}
+                        loadingText="Updating"
+                        spinnerPlacement='end'
+                        className='px-4'
+                        colorScheme="green"
+                        variant="solid"
+                        onClick={(e)=> handleOnSave(e)}>
+                        Update
+                    </Button>
+
+                </Flex>
+            </ButtonGroup>
         </form>
     )
 }

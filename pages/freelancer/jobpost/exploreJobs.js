@@ -215,7 +215,6 @@ export default function SearchJobPosts({jobPosts}) {
   const handleSearchChange = (e) => {
     if (e.target.value.length >= 3) {
       setSearching(true);
-      setSearchTerm(e.target.value)
     }
     setSearchTerm(e.target.value);
     if (e.target.value.length <= 2) setSearching(false);
