@@ -19,7 +19,15 @@ import {
   MenuItem,
   MenuDivider,
   Avatar,
-  ButtonGroup
+  ButtonGroup,
+  Drawer,
+  DrawerBody,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  Input
 } from '@chakra-ui/react'
 import {
   HamburgerIcon,
@@ -48,11 +56,11 @@ import { MdDeleteOutline } from "react-icons/md";
 
 
 const Notifications = () => {
-  const initialFocusRef = React.useRef();
   const notifications = useSelector((state) => state.Notification);
   const webSocketUrl = 'ws://localhost:8080/ws/notifications';
   const { removeNt } = useWebSocket(webSocketUrl);
-  const { isOpen, onToggle, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const btnRef = React.useRef()
 
   const handleRemoveNotification = (Notification) => {
     removeNt(Notification);
@@ -60,41 +68,56 @@ const Notifications = () => {
 
 
   // Handle mouse enter to open the popover
- 
+ //  <FaRegBell className={isOpen ? "text-green-500 mx-4": "mx-4"} onMouseOver={onOpen} onMouseOut={onClose}  />
 
   return (<>
-    <Popover
-      placement='bottom-start'
-      closeOnBlur={false}
-      isOpen={isOpen}
-      onClose={onClose}
-    >
-      <PopoverTrigger >
-        <FaRegBell onMouseOver={onToggle}  className='mx-4' />
-      </PopoverTrigger>
-      <PopoverContent className='min-h-60 rounded p-2' color='black' bg='gray.50' borderColor='white'>
-        <PopoverHeader className='border-b-2' pt={4} bg='gray.50' fontWeight='bold'>
-          Notifications
-        </PopoverHeader>
-        <PopoverArrow bg='white' />
-        <PopoverCloseButton className='pt-4' />
-        {(notifications && notifications.length > 0) && notifications.map((nt, idx) => {
-          return <div key={idx} className='flex flex-row p-2 border-b mx-2 '>
-            <div className='text-sm min-w-[90%] max-w-[90%]  px-2 my-1'>
-              {nt.message}
+      <Button size="sm" mx={4} ref={btnRef} colorScheme='green' onClick={onOpen}>
+        <FaRegBell/>
+      </Button>
+    <Drawer
+        isOpen={isOpen}
+        placement='right'
+        onClose={onClose}
+        finalFocusRef={btnRef}
+        size="md"
+ 
+      >
+        <DrawerOverlay />
+        <DrawerContent >
+          <DrawerCloseButton />
+          <DrawerHeader className=''> Notifications</DrawerHeader>
+          <DrawerBody className=''>
+
+            {(notifications && notifications.length > 0 ) && notifications.map((item) => {
+              return <div className='w-full border min-h-20 p-2 pb-4 mb-3'>
+              <div className='w-full flex justify-between'>
+                <h1>{item.subject}</h1>
+                <MdDeleteOutline onClick={()=> handleRemoveNotification(item)} className='inline-block cursor-pointer text-red-500'/>
+              </div>
+              <div className='w-full'>
+                <p className='text-xs pt-2'>{item.message}</p>
+              </div>
             </div>
-            <div className='flex justify-end  items-center'>
-              <MdDeleteOutline onClick={() => handleRemoveNotification(nt)} className='text-red-500 text-xl cursor-pointer' />
+            })}
+            {(!notifications || notifications.length == 0 ) && <div className='w-full  flex min-h-full p-2 pb-4 mb-3'>
+              <div className='w-full flex justify-center items-center'>
+                <p className='inline'><MdDeleteOutline className='inline-block cursor-pointer mx-2 mb-1'/>
+                 No Notifications 
+                </p>
+                
+              </div>
             </div>
-          </div>
-        })}
-        {(!notifications || notifications.length == 0) && <div className='flex flex-row p-2 pb-4 '>
-          <div className='text-sm w-full px-2 my-1 '>
-            No notifications
-          </div>
-        </div>}
-      </PopoverContent>
-    </Popover>
+            }
+
+            
+          </DrawerBody>
+
+          <DrawerFooter>
+           
+            
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
   </>)
 }
 

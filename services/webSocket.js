@@ -9,13 +9,16 @@ import React from 'react';
 const useWebSocket = (url) => {
   const dispatch = useDispatch();
   const authStatus = useSelector((state) => state.Auth.isLogin);
-  const [socket, setSocket] = React.useState(null)
+  const [socket, setSocket] = React.useState(null);
+  const [reconnectAttempts, setReconnectAttempts] = React.useState(0);
+  const maxReconnectCount = 5;
 
   useEffect(() => {
     const socketInstance = new WebSocket(url);
 
     
     socketInstance.onopen = () => {
+      setReconnectAttempts(0);
     };
 
     socketInstance.onmessage = (event) => {
@@ -25,11 +28,17 @@ const useWebSocket = (url) => {
     };
 
     socketInstance.onerror = (error) => {
-      
+
     };
 
-    socketInstance.onclose = () => {
+    socketInstance.onclose = (event) => {
       console.log('WebSocket connection closed');
+      if (event.code !== 1000 && maxReconnectCount < reconnectAttempts){
+        setReconnectAttempts((prevAttempt) => prevAttempt + 1);
+        setTimeout(() => {
+          createSocket();
+        }, 3000); // Reconnecting
+      }
     };
 
     setSocket(socketInstance);
@@ -46,10 +55,10 @@ const useWebSocket = (url) => {
       if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify(message)); // Send the message to the WebSocket server
         console.log('Message sent:', message);
-        dispatch(removeNotification({id: message.id}));
       } else {
         console.log('WebSocket is not open. Cannot send message.');
       }
+      dispatch(removeNotification({id: message.id}));
     },
     [socket] // This function depends on the socket instance
   );

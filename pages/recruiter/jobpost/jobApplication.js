@@ -275,6 +275,42 @@ export default function jobposts({jobPosts}) {
         
     }
 
+    const fetchJobApplications = async (postId) => {
+    
+        try {
+            let headersList = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            }
+            let response = await fetch("http://localhost:8080/recruiter/getJobPostApplications", {
+                method: "POST",
+                headers: headersList,
+                credentials: "include",
+                body: JSON.stringify({ "postId": postId })
+            });
+            let data = await response.json();
+            if (data.success) {
+                setApplications(data.applications)
+            } else {
+                toast({
+                    title: 'JobPost',
+                    description: "Unable to Get Applications",
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                  })
+            }
+        } catch (error) {
+            toast({
+                title: 'JobPost',
+                description: "Unable to Get Applications",
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+              })
+        }
+    }
+
 
     return (<>
     <ProfileModal profile={profile} isOpen={isOpen} onClose={onClose} />
@@ -295,8 +331,8 @@ export default function jobposts({jobPosts}) {
                             <Card className='p-4 pt-6 mb-6' key={index}>
                                 <Tabs variant='soft-rounded' colorScheme='green'>
                                     <TabList className='pl-4'>
-                                        <Tab>Post</Tab>
-                                        <Tab>Applications</Tab>
+                                        <Tab onClick={() => setApplications([])}>Post</Tab>
+                                        <Tab onClick={() => fetchJobApplications(job.id)}>Applications</Tab>
                                     </TabList>
                                     <TabPanels>
                                         <TabPanel>
@@ -339,7 +375,7 @@ export default function jobposts({jobPosts}) {
                                             </CardBody>
                                         </TabPanel>
                                         <TabPanel>
-                                        {(job.applicationList && job.applicationList.length > 0 ) ?  <TableContainer>
+                                        {(application && application.length > 0 ) ?  <TableContainer>
                                                 <Table variant='simple'>
 
                                                     <Thead>
@@ -350,7 +386,7 @@ export default function jobposts({jobPosts}) {
                                                         </Tr>
                                                     </Thead>
                                                     <Tbody>
-                                                    {job.applicationList.map((ap) => {
+                                                    {application.map((ap) => {
                                                             return <Tr className="text-sm">
                                                                 <Td onClick={() => viewProfile(ap.freelancerId)} className="cursor-pointer">View Profile</Td>
                                                                 <Td>{ap.date}</Td>

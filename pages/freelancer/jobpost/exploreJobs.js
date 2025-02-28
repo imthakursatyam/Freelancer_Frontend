@@ -22,7 +22,8 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Checkbox
+  Checkbox,
+  useToast
 
 } from '@chakra-ui/react'
 import React from 'react';
@@ -70,28 +71,55 @@ export async function getServerSideProps(context) {
 }
 
 
-function ApplyModal({ isOpen, onClose, info }) {
+function ApplyModal({ isOpen, onClose, info, setSpin, spin }) {
   const [message, setMessage] = React.useState("");
+  const toast = useToast();
   const handleApply = async () => {
-    console.log(message, info.id);
-    let headersList = {
-      "Accept": "application/json",
-      "Content-Type": "application/json"
-    }
-
-    let response = await fetch("http://localhost:8080/jobPost/applyJobPost", {
-      method: "POST",
-      body: JSON.stringify({ id: info.id, message: message }),
-      headers: headersList,
-      credentials: "include"
-    });
-
-    let data = await response.json();
-    console.log(data)
-    if (data.success) {
-      console.log("applied to post successfully");
-      onClose();
-    }
+    setSpin(true);
+    try {
+      let headersList = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+  
+      let response = await fetch("http://localhost:8080/jobPost/applyJobPost", {
+        method: "POST",
+        body: JSON.stringify({ id: info.id, message: message }),
+        headers: headersList,
+        credentials: "include"
+      });
+  
+      let data = await response.json();
+       if (data.success) {
+        toast({
+          title: 'JobPost',
+          description: data.message,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        })
+        onClose();
+      } else {
+        toast({
+          title: 'JobPost',
+          description: data.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+      }
+     
+      } catch (error) {
+        toast({
+          title: 'JobPost',
+          description: "Some Error Occurred",
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+      } finally {
+        setSpin(false);
+      }
   }
 
   return (
@@ -124,8 +152,8 @@ function ApplyModal({ isOpen, onClose, info }) {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={handleApply} mx={2} size='sm' colorScheme='green' variant='solid'>
-              Send Mail
+            <Button isLoading={spin} loadingText="Applying" spinnerPlacement='end' onClick={() => handleApply()} mx={2} size='sm' colorScheme='green' variant='solid'>
+              Apply
             </Button>
             <Button size="sm" onClick={onClose}>Close</Button>
           </ModalFooter>
@@ -200,6 +228,7 @@ export default function SearchJobPosts({jobPosts}) {
   const [apply, setApply] = React.useState(false);
   const [isSearching, setSearching] = React.useState(false);
   const [searchedJobPosts, setSearchedJobPosts] = React.useState([]);
+  const [spin, setSpin] = React.useState(false);
 
 
   React.useEffect(() => {
@@ -251,7 +280,7 @@ export default function SearchJobPosts({jobPosts}) {
   };
   return (<>
     {!apply && <InfoModal info={info} isOpen={isOpen} onClose={onClose} />}
-    {apply && <ApplyModal info={info} isOpen={isOpen} onClose={onClose} />}
+    {apply && <ApplyModal info={info} isOpen={isOpen} onClose={onClose} setSpin={setSpin} spin={spin} />}
     <div className="bg-gray-50 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto flex items-center justify-between min-w-full max-w-2xl lg:mx-0">

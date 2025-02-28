@@ -22,7 +22,8 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Checkbox
+  Checkbox,
+  useToast
 
 } from '@chakra-ui/react'
 import React from 'react';
@@ -31,6 +32,9 @@ import { useDisclosure } from '@chakra-ui/react';
 import { Input, InputGroup, InputLeftElement, Icon } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import cookie from "cookie";
+import { MdOutlineDelete, MdEditDocument } from "react-icons/md";
+import { useRouter } from 'next/router';
+
 export async function getServerSideProps(context) {
   try {
       
@@ -127,13 +131,14 @@ function InfoModal({ isOpen, onClose, info }) {
 }
 
 export default function AppliedJobPosts({jobPosts}) {
-  const [searchTerm, setSearchTerm] = React.useState('');
-
+  const [spin, setSpin] = React.useState(false);
+  const toast = useToast();
+  const router = useRouter();
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  
   const [info, setInfo] = React.useState({});
 
 
@@ -141,6 +146,58 @@ export default function AppliedJobPosts({jobPosts}) {
     setInfo(post);
     onOpen();
   };
+
+  const deletePost = async (id) => {
+    try {
+      setSpin(true);
+      let headersList = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+       }
+       
+       let response = await fetch("http://localhost:8080/freelancer/deleteAppliedPost", { 
+         method: "POST",
+         body: JSON.stringify({
+          "postId": id
+       }),
+         headers: headersList,
+         credentials: "include"
+       });
+  
+       let data = await response.json();
+       if (data.success) {
+        toast({
+          title: 'JobPost',
+          description: data.message,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        })
+        router.reload();
+      } else {
+        toast({
+          title: 'JobPost',
+          description: data.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+      } 
+      } catch (error) {
+        toast({
+          title: 'JobPost',
+          description: "Some Error Occurred",
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+      } finally {
+        setSpin(false);
+      }
+      
+  }
+
+
   return (<>
     {<InfoModal info={info} isOpen={isOpen} onClose={onClose} />}
    
@@ -163,12 +220,14 @@ export default function AppliedJobPosts({jobPosts}) {
 
               </div>
               <div className="group relative border-b border-gray-200 pb-4">
-                <h3 className="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600">
-                  <a href={"#"}>
+                <h3 className="mt-3 text-lg/6 justify-between flex font-semibold text-gray-900 group-hover:text-gray-600">
+
                     <span className="absolute inset-0" />
                     {post.title}
-                  </a>
+                    <Button isLoading={spin} spinnerPlacement='end' onClick={() => deletePost(post.id)} size="xs" className='inline-block ' bg="red.500"><MdOutlineDelete className='text-white' /></Button>
+          
                 </h3>
+           
                 <p className="mt-5 line-clamp-3 text-sm/6 text-gray-600">{post.desc}</p>
               </div>
 
