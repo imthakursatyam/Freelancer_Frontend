@@ -1,91 +1,57 @@
-import React from "react";
+import React, { act } from "react";
 import { FaSearch, FaEllipsisV } from "react-icons/fa";
 import { BsEmojiSmile, BsPaperclip, BsSend } from "react-icons/bs";
 import { IoMdChatbubbles } from "react-icons/io";
 import { Avatar } from "@chakra-ui/react";
 import { useSelector, useDispatch } from 'react-redux';
+import useWebSocket from '../../services/webSocket.js';
+import { addConversation, setActiveChat, addChat } from '@/store/slices/chatState';
 
-const ChatList = ({ chatList, setCurrChat, currRole }) => {
-  if (currRole == "RECRUITER"){
+const ChatList = ({ chatList, setActiveChatId, currUser}) => {
+
     return <>
     <div className="space-y-3">
-      {chatList.map((item, index) => (
+      {chatList && chatList.map((item, index) => (
         <div
           key={index}
           className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-200"
-          onClick={() => setCurrChat(item)}
+          onClick={() => setActiveChatId(item.id)}
         >
-          <IoMdChatbubbles className="text-2xl text-gray-500 mr-3" />
+          <IoMdChatbubbles onClick={console.log(item, "item logged")} className="text-2xl text-gray-500 mr-3" />
           <div>
-            <h2 className="font-medium">{item.freelancerName}</h2>
+            <h2 className="font-medium">{currUser == item.userOne ? item.userTwoName : item.userOneName}</h2>
             <p className="text-sm text-gray-500">Last message...</p>
           </div>
         </div>
       ))}
     </div>
   </>
-  } else {
-    return <>
-    <div className="space-y-3">
-      {chatList.map((item, index) => (
-        <div
-          key={index}
-          className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-200"
-          onClick={() => setCurrChat(item)}
-        >
-          <IoMdChatbubbles className="text-2xl text-gray-500 mr-3" />
-          <div>
-            <h2 className="font-medium">{currRole == "FREELANCER" ? item.recruiterName: item.freelancerName}</h2>
-            <p className="text-sm text-gray-500">Last message...</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </>
-  }
  
 }
 
 
-const chat3 = [
-  { from: "user1", to: "user2", message: "Nice! Need any help?", date: "2025-03-08 10:04:00" },
-  { from: "user2", to: "user1", message: "Maybe later! Thanks for asking.", date: "2025-03-08 10:05:20" },
-  { from: "user1", to: "user2", message: "Hello!", date: "2025-03-08 10:00:00" },
-  { from: "user2", to: "user1", message: "Hey! How are you?", date: "2025-03-08 10:01:00" },
-];
-
-const chat1 = [
-  { from: "user1", to: "user2", message: "Hello!", date: "2025-03-08 10:00:00" },
-  { from: "user2", to: "user1", message: "Hey! How are you?", date: "2025-03-08 10:01:00" },
-  { from: "user1", to: "user2", message: "I'm good, thanks! What about you?", date: "2025-03-08 10:02:30" },
-  { from: "user2", to: "user1", message: "Doing great! Just working on some projects.", date: "2025-03-08 10:03:15" }
-]
-
-const chat2 = [
-  { from: "user1", to: "user2", message: "I'm good, thanks! What about you?", date: "2025-03-08 10:02:30" },
-  { from: "user2", to: "user1", message: "Doing great! Just working on some projects.", date: "2025-03-08 10:03:15" },
-  { from: "user1", to: "user2", message: "Nice! Need any help?", date: "2025-03-08 10:04:00" },
-  { from: "user2", to: "user1", message: "Maybe later! Thanks for asking.", date: "2025-03-08 10:05:20" }
-]
-
 
 const ChatPage = () => {
   const [isOnline, setOnline] = React.useState(false);
-  const [messages, setMessages] = React.useState([]);
   const [message, setMessage] = React.useState("");
-  const [chatList, setChatList] = React.useState([]);
-  const [currChat, setCurrChat] = React.useState([]);
-  const currRole = useSelector((state) => state.Auth.currRole);
+  const [currUser, setCurrUser] = React.useState("");
+  const chatList = useSelector((state) => state.Chat.conversations);
+  const activeChatData =  useSelector((state) => state.Chat.conversations.find((chat) => chat.id == state.Chat.activeChatId));
 
+  const dispatch = useDispatch();
 
-  const fetchMessages = () => {
-    if (currChat.name == "alice") setMessages(chat1);
-    if (currChat.name == "meera") setMessages(chat2);
-    if (currChat.name == "john") setMessages(chat3);
-  }
+  const { sendChatMessage } = useWebSocket();
+
+  const setActiveChatId = (id) => {
+    dispatch(setActiveChat({ chatId: id}));
+  } 
 
   const sendMessage = () => {
-    setMessages([...messages, {from: "user1", to: "user2", message:"added this message", date: "2025-03-08 10:04:00"}])
+    if (message.length == 0) return;
+    if (message.endsWith(" ")) setMessage(message.trim());
+    const receiver = currUser == activeChatData.userOne ? activeChatData.userTwo : activeChatData.userOne;
+    sendChatMessage({from: currUser, to:receiver, content: message, conversationId: activeChatData.id});
+    setMessage("");
   }
 
   const fetchChatList = async () => {
@@ -101,18 +67,11 @@ const ChatPage = () => {
     });
 
     let data = await response.json();
-    console.log(data);
     if (data.success) {
-      setChatList(data.chatList);
-    } else {
-      /*toast({
-        title: 'Chat',
-        description: data.message,
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      })*/
+      dispatch(addConversation({conversations: data.chatList}));
+      setCurrUser(data.currUser);
     }
+    console.log(data, data.chatList);
   }
 
   const checkIsOnline = async () => {
@@ -132,27 +91,20 @@ const ChatPage = () => {
     console.log(data);
     if (data.status) {
       setOnline(data.isOnline);
-    } else {
-      /*toast({
-        title: 'Chat',
-        description: data.message,
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      })*/
-     setOnline(false);
     }
+     setOnline(false);
   }
 
 
+  React.useEffect(() => {
+    fetchChatList();
+  }, [])
 
-  React.useEffect(fetchChatList, [])
-
-
+/*
   React.useEffect(() => {
     checkIsOnline();
   }, [currChat])
-
+*/
   return (
     <div className="flex h-screen bg-gray-100">
 
@@ -172,18 +124,18 @@ const ChatPage = () => {
         </div>
 
         {/* Chat List */}
-        <ChatList chatList={chatList} setCurrChat={setCurrChat}/>
+        <ChatList chatList={chatList} setActiveChatId={setActiveChatId} currUser={currUser}/>
       </div>
 
 
 
       {/* Chat Window */}
       <div className="flex-1 flex flex-col ">
-        {Object.keys(currChat).length > 0 && <div className="bg-white p-4 flex justify-between items-center border-b">
+        {(activeChatData && Object.keys(activeChatData).length > 0) && <div className="bg-white p-4 flex justify-between items-center border-b">
           <div className="flex items-center gap-3">
           <Avatar size="sm" name='Prosper Otemuyiwa' src='https://bit.ly/prosper-baba' />
           <div className="flex flex-col gap-0">
-          <h2 className="font-bold ">{currRole=="FREELANCER" ? currChat.recruiterName: currChat.freelancerName}</h2>
+          <h2 className="font-bold ">{currUser == activeChatData.userOne ? activeChatData.userTwoName : activeChatData.userOneName}</h2>
           <h3 className="font-light text-xs">{isOnline ? "online": "offline"}</h3>
           </div>
           
@@ -191,11 +143,11 @@ const ChatPage = () => {
           <FaEllipsisV className="text-gray-500 cursor-pointer" />
         </div>}
         <div className="flex-1 bg-gray-200 p-4 space-y-3 overflow-auto px-16 py-8">
-          {messages.map((item, idx) => {
-            return item.from == "user1" ? <div className="justify-self-end px-4 bg-white p-3 rounded-lg shadow-md max-w-xs">
-              {item.message}
+          {activeChatData?.messages?.map((item, idx) => {
+            return item.from == currUser ? <div className="justify-self-end px-4 bg-white p-3 rounded-lg shadow-md max-w-xs">
+              {item.content}
             </div> : <div className="justify-self-start px-4 bg-green-400 text-white p-3 rounded-lg shadow-md max-w-xs">
-              {item.message}
+              {item.content}
             </div>
           })}
 

@@ -57,8 +57,7 @@ import { MdDeleteOutline } from "react-icons/md";
 
 const Notifications = () => {
   const notifications = useSelector((state) => state.Notification);
-  const webSocketUrl = 'ws://localhost:8080/ws/notifications';
-  const { removeNt } = useWebSocket(webSocketUrl);
+  const { removeNt } = useWebSocket();
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = React.useRef()
 
@@ -256,7 +255,7 @@ export default function WithSubnavigation() {
                   <Icon color={'green.400'} w={5} h={5} as={ChevronRightIcon} />
                 </Flex>
               </MenuItem>
-              <MenuItem className='hover:text-green-400 rounded-md' _hover={{ bg: useColorModeValue('green.50', 'gray.900') }} >Settings
+              <MenuItem onClick={() => router.push("/chat/chatPage")} className='hover:text-green-400 rounded-md' _hover={{ bg: useColorModeValue('green.50', 'gray.900') }} >Chats
                 <Flex
                   transition={'all .2s ease'}
                   className='hover:opacity-100 hover:transform hover:translate-x-0'
