@@ -13,12 +13,8 @@ export const chatState = createSlice({
   reducers: {
 
     addConversation(state, action) {
-      return {...state , conversations: Array.from(
-        new Map(
-          [...state.conversations, ...action.payload.conversations].map((conversation) => [conversation.id, conversation])
-        ).values()
-      )
-    };
+      console.log("hello")
+      return state;
     },
 
     addChat(state, action) {
@@ -29,10 +25,10 @@ export const chatState = createSlice({
         ...state, // Preserve the rest of the state
         conversations: state.conversations.map((conversation) =>
           conversation.id == conversationId
-            ? { 
-                ...conversation, 
-                messages: [...(conversation.messages || []).filter(msg => msg.id != chat.id), chat].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Append new message correctly
-              }
+            ? {
+              ...conversation,
+              messages: [...conversation.messages.filter(msg => msg.id != chat.id), chat].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) // Append new message correctly
+            }
             : conversation
         )
       };
@@ -46,37 +42,37 @@ export const chatState = createSlice({
         ...state, // Preserve the rest of the state
         conversations: state.conversations.map((conversation) =>
           conversation.id == conversationId
-            ? { 
-                ...conversation, // copy conversation
-                messages: Array.from(
-                  new Map(  // Remove duplicates
-                    [...(conversation.messages || []), ...messages].map(msg => [msg.id, msg])).values() // extract values
-                  ).sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt)) // sor
-              }
+            ? {
+              ...conversation, // copy conversation
+              messages: [
+                new Map(  // Remove duplicates
+                  [...conversation.messages, ...messages].map(obj => [msg.id, msg])).values() // extract values
+              ].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) // sort by date
+            }
             : conversation
         )
       };
     },
 
     setActiveChat(state, action) {
-      return {...state, activeChatId: action.payload.chatId};
+      return { ...state, activeChatId: action.payload.chatId };
     },
 
     addTyping(state, action) {
       if (action.payload.conversationId != state.activeChatId) return state;
-      return {...state, isTyping: true};
+      return { ...state, isTyping: true };
     },
 
     stopTyping(state, action) {
       if (action.payload.conversationId != state.activeChatId) return state;
-      return {...state, isTyping: false};
+      return { ...state, isTyping: false };
     },
 
     isOnline(state, action) {
-      if (state.activeChatId == "") return state; 
+      if (state.activeChatId == "") return state;
       const conversation = state.conversations.find((chat) => chat.id == state.activeChatId);
       if (conversation.userOne == action.payload.sender || conversation.userTwo == action.payload.sender) {
-        return {...state, isOnline: action.payload.onlineStatus};
+        return { ...state, isOnline: action.payload.onlineStatus };
       }
       return state;
     }

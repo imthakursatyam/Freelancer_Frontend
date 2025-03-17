@@ -4,7 +4,8 @@ import { addNotification, removeNotification} from '../store/slices/notification
 import { authState } from '@/store/slices/authState';
 import { useSelector, useDispatch } from 'react-redux';
 import React from 'react';
-import { addChat } from '@/store/slices/chatState';
+import { addChat, addTyping, stopTyping, isOnline } from '@/store/slices/chatState';
+import { LuMessageSquareWarning } from 'react-icons/lu';
 
 const useWebSocket = () => {
   const webSocketUrl = 'ws://localhost:8080/ws';
@@ -27,6 +28,9 @@ const useWebSocket = () => {
       console.log('Message received:', message);
       if (message.type == "NOTIFICATION_LIST")  dispatch(addNotification(message));
       if (message.type == "CHAT") dispatch(addChat(message));
+      if (message.type == "TYPING") dispatch(addTyping(message));
+      if (message.type == "STOP_TYPING") dispatch(stopTyping(message));
+      if (message.type == "IS_ONLINE") dispatch(isOnline(message));
     };
 
     socketInstance.onerror = (error) => {
@@ -56,9 +60,7 @@ const useWebSocket = () => {
     (message) => {
       if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify(message)); // Send the message to the WebSocket server
-        console.log('Message sent:', message);
       } else {
-        console.log('WebSocket is not open. Cannot send message.');
       }
       dispatch(removeNotification({id: message.id}));
     },
@@ -69,16 +71,31 @@ const useWebSocket = () => {
     (message) => {
       if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify({type: "CHAT", chat : message})); // Send the message to the WebSocket server
-        console.log('Message sent:', message);
       } else {
-        console.log('WebSocket is not open. Cannot send message.');
       }
       dispatch(addChat({chat: message}));
     },
     [socket] // This function depends on the socket instance
   );
 
-  return {removeNt, sendChatMessage};
+  const sendIsTyping = React.useCallback(
+    (message) => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({type: message.type, sender: message.sender, receiver: message.receiver, conversationId: message.conversationId}));
+      } else {
+      }
+    },
+    [socket] // This function depends on the socket instance
+  );
+
+  const checkIsOnline = React.useCallback((message) => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({type: "IS_ONLINE", sender: message.sender, receiver: message.receiver}));
+    } else {
+    }
+  }, [socket]);
+
+  return {removeNt, sendChatMessage, sendIsTyping, checkIsOnline};
 };
 
 export default useWebSocket;
