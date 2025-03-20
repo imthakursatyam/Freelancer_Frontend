@@ -382,7 +382,8 @@ export default function jobposts({jobPosts}) {
                                                         <Tr>
                                                             <Th>Profile</Th>
                                                             <Th>Applied Date</Th>
-                                                            <Th >message</Th>
+                                                            <Th >Message</Th>
+                                                            <Th>Action</Th>
                                                         </Tr>
                                                     </Thead>
                                                     <Tbody>
@@ -390,7 +391,11 @@ export default function jobposts({jobPosts}) {
                                                             return <Tr className="text-sm">
                                                                 <Td onClick={() => viewProfile(ap.freelancerId)} className="cursor-pointer">View Profile</Td>
                                                                 <Td>{ap.date}</Td>
-                                                                <Td className='text-right'>{ap.freelancerMessage}</Td>
+                                                                <Td className='text-right text-xs'>{ap.freelancerMessage}</Td>
+                                                                <Td className=''>
+                                                                    <Button className='mr-2' colorScheme='green' size='xs'>Accept</Button>
+                                                                    <Button colorScheme='red' size='xs'>Reject</Button>
+                                                                </Td>
                                                             </Tr>
                                                         })}
                                                     {!job.applicationList && <div>No Job Applications for this Post</div>}

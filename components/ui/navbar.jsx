@@ -39,6 +39,7 @@ import {
 import Link from "next/link";
 import { useSelector, useDispatch } from 'react-redux';
 import { setCurrRole, setLogin } from '@/store/slices/authState';
+import { addNotification, removeNotification} from '@/store/slices/notificationState';
 import { useRouter } from 'next/router';
 import useWebSocket from '../../services/webSocket.js';
 import React from 'react';
@@ -58,11 +59,13 @@ import { MdDeleteOutline } from "react-icons/md";
 const Notifications = () => {
   const notifications = useSelector((state) => state.Notification);
   const { removeNt } = useWebSocket();
+  const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = React.useRef()
 
   const handleRemoveNotification = (Notification) => {
-    removeNt(Notification);
+    removeNt({type: "DELETE_NOTIFICATION", notification: Notification});
+    dispatch(removeNotification({id: Notification.id}));
   };
 
 

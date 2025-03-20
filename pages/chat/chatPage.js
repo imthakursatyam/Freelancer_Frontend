@@ -62,9 +62,10 @@ const ChatPage = () => {
   const handleTyping = (e) => {
     setMessage(e.target.value);
     if (e.target.value.length > 0) {
-      if (!activeChatData) {
+      if (!isOnline || !activeChatData) {
         return;
       }
+      
       sendIsTyping({
         conversationId: activeChatData.id,
         sender: currUser,
