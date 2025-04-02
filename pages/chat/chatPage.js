@@ -1,33 +1,67 @@
-import React, { act } from "react";
+import React, { act } from "react"; 
 import { FaSearch, FaEllipsisV } from "react-icons/fa";
 import { BsEmojiSmile, BsPaperclip, BsSend } from "react-icons/bs";
-import { IoMdChatbubbles } from "react-icons/io";
+import { IoMdChatbubbles, IoIosMenu } from "react-icons/io";
 import { Avatar } from "@chakra-ui/react";
 import { useSelector, useDispatch } from 'react-redux';
 import useWebSocket from '../../services/webSocket.js';
 import { addConversation, setActiveChat, addChats } from '@/store/slices/chatState';
 import { debounce, set } from 'lodash';
-
+import { Radio, RadioGroup, Stack } from '@chakra-ui/react';
+import { Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, useDisclosure } from '@chakra-ui/react';
 const ChatList = ({ chatList, setActiveChatId, currUser }) => {
 
-  return <>
-    <div className="space-y-3">
-      {chatList && chatList.map((item, index) => (
-        <div
-          key={index}
-          className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-200"
-          onClick={() => setActiveChatId(item.id)}
-        >
-          <IoMdChatbubbles  className="text-2xl text-gray-500 mr-3" />
-          <div>
-            <h2 className="font-medium">{currUser == item.userOne ? item.userTwoName : item.userOneName}</h2>
-            <p className="text-sm text-gray-500">Last message...</p>
-          </div>
+  return <div className="space-y-3">
+    {chatList && chatList.map((item, index) => (
+      <div
+        key={index}
+        className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-200"
+        onClick={() => setActiveChatId(item.id)}
+      >
+        <IoMdChatbubbles className="text-2xl text-gray-500 mr-3" />
+        <div>
+          <h2 className="font-medium">{currUser == item.userOne ? item.userTwoName : item.userOneName}</h2>
+          <p className="text-sm text-gray-500">Last message...</p>
         </div>
-      ))}
-    </div>
-  </>
+      </div>
+    ))}
+  </div>
 
+
+}
+
+function ChatListDrawer({ chatList, setActiveChatId, currUser }) {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [placement, setPlacement] = React.useState('left')
+
+  return (<>
+    <IoIosMenu onClick={onOpen} className="text-gray-500 md:hidden text-2xl cursor-pointer mr-5" />
+    <Drawer placement={placement} onClose={onClose} isOpen={isOpen}>
+      <DrawerOverlay />
+      <DrawerContent>
+        <DrawerHeader borderBottomWidth='1px'>Chats</DrawerHeader>
+        <DrawerBody className="px-0">
+          <div className="space-y-3">
+            {chatList && chatList.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-200"
+                onClick={() => setActiveChatId(item.id)}
+              >
+                <IoMdChatbubbles className="text-2xl text-gray-500 mr-3" />
+                <div>
+                  <h2 className="font-medium">{currUser == item.userOne ? item.userTwoName : item.userOneName}</h2>
+                  <p className="text-sm text-gray-500">Last message...</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  </>
+  )
 }
 
 
@@ -39,10 +73,11 @@ const ChatPage = () => {
   const activeChatData = useSelector((state) => state.Chat.conversations.find((chat) => chat.id == state.Chat.activeChatId));
   const dispatch = useDispatch();
   const isTyping = useSelector((state) => state.Chat.isTyping);
-  const { sendChatMessage, sendIsTyping, checkIsOnline} = useWebSocket();
+  const { sendChatMessage, sendIsTyping, checkIsOnline } = useWebSocket();
   const isOnline = useSelector((state) => state.Chat.isOnline);
   const activeChatId = useSelector((state) => state.Chat.activeChatId);
   const chatContainerRef = React.useRef();
+
 
   const stopTyping = React.useCallback(
     debounce(() => {
@@ -65,14 +100,14 @@ const ChatPage = () => {
       if (!isOnline || !activeChatData) {
         return;
       }
-      
+
       sendIsTyping({
         conversationId: activeChatData.id,
         sender: currUser,
         receiver: activeChatData.userOne == currUser ? activeChatData.userTwo : activeChatData.userOne,
         type: "TYPING",
       });
-      stopTyping.cancel(); 
+      stopTyping.cancel();
     }
 
     stopTyping();
@@ -105,35 +140,35 @@ const ChatPage = () => {
     const signal = controller.signal;
 
     async function fetchChat() {
-        try {
-            let response = await fetch(`http://localhost:8080/chat/getUserChat/${activeChatId}`, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                signal // Pass the signal to cancel request if needed
-            });
+      try {
+        let response = await fetch(`http://localhost:8080/chat/getUserChat/${activeChatId}`, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          signal // Pass the signal to cancel request if needed
+        });
 
-            if (!response.ok) throw new Error("Failed to fetch messages");
+        if (!response.ok) throw new Error("Failed to fetch messages");
 
-            let data = await response.json();
-            if (data.success) {
-             
-              dispatch(addChats({ messages: data.messages, conversationId: data.conversationId }));
-            }
-        } catch (error) {
-            if (error.name !== "AbortError") { // Ignore abort errors
-                console.error("Failed to fetch messages", error);
-            }
+        let data = await response.json();
+        if (data.success) {
+
+          dispatch(addChats({ messages: data.messages, conversationId: data.conversationId }));
         }
+      } catch (error) {
+        if (error.name !== "AbortError") { // Ignore abort errors
+          console.error("Failed to fetch messages", error);
+        }
+      }
     }
 
     fetchChat(); // Call the async function
 
     return () => controller.abort(); // Cleanup function to cancel request if component unmounts or `activeChatId` changes
-}, [activeChatId]); // ✅ Dependency array
+  }, [activeChatId]); // ✅ Dependency array
 
 
   React.useEffect(() => {
@@ -168,18 +203,19 @@ const ChatPage = () => {
     }
   }
 
-  
 
 
 
 
 
 
-  return (
+
+  return (<>
+
     <div className="flex h-screen bg-gray-100">
 
       {/* Sidebar */}
-      <div className="w-1/4 bg-white p-4 border-r">
+      <div className="hidden lg:block w-1/4 bg-gray-50 p-4 border-r">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold">Chats</h1>
           <FaEllipsisV className="cursor-pointer text-gray-500" />
@@ -201,7 +237,8 @@ const ChatPage = () => {
 
       {/* Chat Window */}
       <div className="flex-1 flex flex-col ">
-        {(activeChatData && Object.keys(activeChatData).length > 0) && <div className="bg-white p-4 flex justify-between items-center border-b">
+        {(activeChatData && Object.keys(activeChatData).length > 0) ? <div className="bg-white p-4 flex justify-start items-center border-b">
+          <ChatListDrawer chatList={chatList} setActiveChatId={setActiveChatId} currUser={currUser} />
           <div className="flex items-center gap-3">
             <Avatar size="sm" name='Prosper Otemuyiwa' src='https://bit.ly/prosper-baba' />
             <div className="flex flex-col gap-0">
@@ -211,13 +248,24 @@ const ChatPage = () => {
             </div>
 
           </div>
-          <FaEllipsisV className="text-gray-500 cursor-pointer" />
-        </div>}
-        <div ref={chatContainerRef} className="flex-1 bg-gray-200 p-4 space-y-3 overflow-auto px-16 py-8">
+
+        </div>: <div className="bg-white p-4 flex justify-start items-center border-b">
+          <ChatListDrawer chatList={chatList} setActiveChatId={setActiveChatId} currUser={currUser} />
+          <div className="flex items-center gap-3">
+            
+            <div className="flex flex-col gap-0">
+              <h2 className="font-bold ">No Active Chat</h2>
+             
+            </div>
+
+          </div>
+
+        </div> }
+        <div ref={chatContainerRef} className="flex-1 bg-gray-200 p-4 text-sm space-y-3 overflow-auto px-8 md:px-16 py-8">
           {activeChatData?.messages?.map((item, idx) => {
-            return item.from == currUser ? <div className="justify-self-end px-4 bg-white p-3 rounded-lg shadow-md max-w-xs">
+            return item.from == currUser ? <div className="justify-self-end  px-4 bg-white p-2 rounded-lg shadow-md max-w-xs">
               {item.content}
-            </div> : <div className="justify-self-start px-4 bg-green-400 text-white p-3 rounded-lg shadow-md max-w-xs">
+            </div> : <div className="justify-self-start  px-4 bg-green-400  text-white p-2 rounded-lg shadow-md max-w-xs">
               {item.content}
             </div>
           })}
@@ -239,6 +287,7 @@ const ChatPage = () => {
         </div>
       </div>
     </div >
+  </>
   );
 };
 

@@ -8,6 +8,7 @@ import AuthValidator from "@/services/AuthValidator.js";
 import { useRouter } from "next/router.js";
 import PageSpinner from "@/components/custom/PageSpinner.js";
 
+
 export default function App({ Component, pageProps }) {
   const [progress, setProgress] = React.useState(false);
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function App({ Component, pageProps }) {
   return <>
   
     <StateProvider store={store}>
+     
     <UiProvider>
      <Navbar/>
     <PageSpinner Loading={progress} />

@@ -39,7 +39,8 @@ import {
 import Link from "next/link";
 import { useSelector, useDispatch } from 'react-redux';
 import { setCurrRole, setLogin } from '@/store/slices/authState';
-import { addNotification, removeNotification} from '@/store/slices/notificationState';
+import { addNotification, removeNotification, clearNotifications} from '@/store/slices/notificationState';
+import { clearChatState } from '@/store/slices/chatState.js';
 import { useRouter } from 'next/router';
 import useWebSocket from '../../services/webSocket.js';
 import React from 'react';
@@ -154,6 +155,8 @@ export default function WithSubnavigation() {
       if (data.success == true) {
         dispatch(setLogin({ val: false }));
         dispatch(setCurrRole({ val: "" }));
+        dispatch(clearNotifications());
+        dispatch(clearChatState());
         router.push("/");
       }
     } catch (error) {
@@ -166,16 +169,17 @@ export default function WithSubnavigation() {
 
 
   return (
-    <Box className=''>
+    <Box className='fixed w-full top-0 z-50 '>
       <Flex
-        bg={useColorModeValue('white', 'gray.800')}
-        color={useColorModeValue('gray.600', 'white')}
+        bg={useColorModeValue('black', 'gray.800')}
+        color={useColorModeValue('gray.100', 'white')}
         minH={'60px'}
         py={{ base: 2 }}
         px={{ base: 4 }}
         borderBottom={1}
         borderStyle={'solid'}
-        borderColor={useColorModeValue('gray.200', 'gray.900')}
+        borderColor={useColorModeValue('black', 'gray.900')}
+        shadow={"lg"}
         align={'center'}>
         <Flex
           flex={{ base: 1, md: 'auto' }}
@@ -193,7 +197,7 @@ export default function WithSubnavigation() {
             <Text
               textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
               fontFamily={'heading'}
-              color={useColorModeValue('gray.800', 'white')}
+              color={useColorModeValue('gray.100', 'white')}
               className='font-bold text-xl '
             >
               Freelancer
@@ -222,10 +226,10 @@ export default function WithSubnavigation() {
             fontSize={'sm'}
             fontWeight={600}
             color={'white'}
-            bg={'green.400'}
+            bg={'pink.400'}
             href={'#'}
             _hover={{
-              bg: 'green.400',
+              bg: 'pink.400',
             }}>
             Sign Up
           </Button></Link>}

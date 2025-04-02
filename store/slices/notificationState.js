@@ -17,7 +17,11 @@ export const notificationState = createSlice({
     removeNotification(state, action) {
       return state.filter((item) => item.id != action.payload.id);
     },
+
+    clearNotifications(state, action) {
+      return [];
+    }
   }
 });
 
-export const { addNotification, removeNotification } = notificationState.actions;
+export const { addNotification, removeNotification, clearNotifications } = notificationState.actions;

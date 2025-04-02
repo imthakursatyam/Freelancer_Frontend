@@ -79,8 +79,17 @@ export const chatState = createSlice({
         return {...state, isOnline: action.payload.onlineStatus};
       }
       return state;
+    },
+
+    clearChatState(state, action) {
+      return {
+        isOnline: false,
+        isTyping: false,
+        activeChatId: "",
+        conversations: []
+      };
     }
   }
 });
 
-export const { addConversation, addChat, setActiveChat, addTyping, stopTyping, isOnline, addChats } = chatState.actions;
+export const { addConversation, addChat, setActiveChat, addTyping, stopTyping, isOnline, addChats, clearChatState } = chatState.actions;

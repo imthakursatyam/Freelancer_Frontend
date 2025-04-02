@@ -213,10 +213,11 @@ export default function AppliedJobPosts({jobPosts}) {
         <div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-300 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3 ">
           {jobPosts && jobPosts.map((post) => (
             <article key={post.id} className="flex max-w-xl p-3 flex-col items-start justify-between rounded-md bg-white">
-              <div className="flex items-center gap-x-4 text-xs">
+              <div className="flex justify-between mb-0.5 w-full items-center text-xs">
                 <time dateTime={post.date} className="text-gray-500">
                   {post.date}
                 </time>
+           
 
               </div>
               <div className="group relative border-b border-gray-200 pb-4">
@@ -251,6 +252,7 @@ export default function AppliedJobPosts({jobPosts}) {
                 <Button onClick={() => showInfo(post)} size='sm' colorScheme='green' variant='solid'>
                   Details
                 </Button>
+                
 
               </Stack>
             </article>
