@@ -12,6 +12,17 @@ import CosmosBackground from "@/components/custom/CosmosBackground.js";
 import { SimpleGrid, Text, Link, Card, CardBody, Icon, Avatar, Wrap, WrapItem, Center, Heading, useColorModeValue, Badge } from "@chakra-ui/react";
 import { FaPlus, FaStar } from "react-icons/fa";
 import { FaBeer, faPlus } from "react-icons/fa";
+import { TbRosetteDiscountCheck } from "react-icons/tb";
+import { FaFacebookF, FaGoogle, FaQuoteLeft, FaAirbnb } from "react-icons/fa";
+import { SiAdobe, SiFujitsu, SiOracle, SiAmazon, SiApple } from "react-icons/si";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, Pagination, EffectCube } from "swiper/modules";
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import "swiper/css/autoplay";
+import "swiper/css/effect-cube";
+
 
 export default function Home() {
 
@@ -36,11 +47,12 @@ export default function Home() {
     <Hero />
 
     <TopJobs />
-    <StaticImages/>
+    <StaticImages />
     <SkillGrid />
-    <StaticFeatures/>
+    <StaticFeatures />
     <FreelancerProfiles />
     <StaticGrid />
+    <Testimonials />
     <FAQ />
 
   </>
@@ -48,7 +60,7 @@ export default function Home() {
 
 const Hero = () => {
   return (<>
-    <div className="lg:mx-16  lg:mt-24 mb-12 lg:mb-16 border-b-2 border-gray-800">
+    <div className="lg:mx-16 font-rajdhani  lg:mt-24 mb-12 lg:mb-16 border-b-2 border-gray-800">
       <div className="mt-8 lg:mt-16 bg-black shadow-xl text-gray-100 rounded-lg p-8">
         <div className="flex flex-row w-full">
           <div className="hidden lg:w-1/5 pt-6 lg:flex">
@@ -128,14 +140,14 @@ const SkillGrid = () => {
   ];
 
   return (<>
-    <Box maxW="" className="border-b-2 mt-10 mb-16 mx-4 border-gray-800 pb-8 lg:mx-16" bg={"black"} >
-      <Text className="text-pink-600 text-4xl lg:text-5xl" fontWeight="bold">Browse talent by category</Text>
+    <Box maxW="" className="border-b-2 font-rajdhani mt-10 mx-4 border-gray-800 pb-8 lg:mx-16" bg={"black"} >
+      <Text className="text-pink-600 font-spectral text-4xl lg:text-5xl" fontWeight="bold">Browse talent by category</Text>
       <Text color="gray.100" mt={2}>
         Looking for work? <Link color="gray.100" fontWeight="bld" >Browse jobs</Link>
       </Text>
-      <SimpleGrid className="mt-2 py-8" columns={{ base: 2, sm: 2, md: 3, lg: 3 }} spacing={2}>
+      <SimpleGrid className="mt-2 py-8" columns={{ base: 2, sm: 2, md: 3, lg: 3 }} spacing={6}>
         {categories.map((category, index) => (
-          <Card className="bg-gray-800 " bg="gray.900" style={{ backgroundColor: "#111827" }} key={index} shadow="sm" borderRadius="" borderWidth={1} borderColor="gray.900">
+          <Card className="bg-gray-800 hover:scale-105 transition delay-150 duration-300 ease-in-out hover:border-pink-800 hover:rounded-xl" bg="gray.900" style={{ backgroundColor: "#111827" }} key={index} shadow="sm" borderRadius="" borderWidth={1} borderColor="gray.900">
             <CardBody className="p-0">
               <Text color="gray.100" className="text-xs lg:mb-3 lg:text-3xl" fontWeight="semibold">{category.name}</Text>
               <Box display="flex" className="text-xs lg:mb-3 gap-1 mt-1" alignItems="center" color="pink.600">
@@ -180,7 +192,7 @@ const StaticGrid = () => {
     },
   ]
   return (
-    <div className="bg-black border-b-2 border-gray-800 px-2 lg:mx-16 lg:my-12 py-24 sm:py-32">
+    <div className="bg-black border-b-2 font-rajdhani border-gray-800 px-2 lg:mx-16 lg:my-12 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center">
           <h2 className="text-base/7 font-semibold text-pink-500">Deploy faster</h2>
@@ -233,8 +245,8 @@ const TopJobs = () => {
   }
 
   return (<>
-    <div className="mx-4 lg:mx-16 border-b-2 border-gray-800 pb-16">
-      <Text className="text-pink-600 text-4xl lg:text-5xl" fontWeight="bold">Browse talent by category</Text>
+    <div className="mx-4 font-rajdhani lg:mx-16 border-b-2 border-gray-800 pb-16">
+      <Text className="text-pink-600 font-spectral text-4xl lg:text-5xl" fontWeight="bold">Browse talent by category</Text>
       <Text className="text-sm" color="gray.100" mt={2}>
         Looking for work? <Link color="gray.100" fontWeight="bld" >Browse jobs</Link>
       </Text>
@@ -318,8 +330,8 @@ const FreelancerProfiles = () => {
     ]
   };
   return (<>
-    <div className="mx-4 lg:mx-16 border-b-2  border-gray-800 pb-16">
-      <Text className="text-pink-600 text-4xl lg:text-5xl" fontWeight="bold">Browse talent by category</Text>
+    <div className="mx-4 lg:mx-16 font-lato border-b-2  border-gray-800 pb-16">
+      <Text className="text-pink-600 font-spectral text-4xl lg:text-5xl" fontWeight="bold">Browse talent by category</Text>
       <Text className="text-sm" color="gray.100" mt={2}>
         Looking for work? <Link color="gray.100" fontWeight="bld" >Browse jobs</Link>
       </Text>
@@ -331,7 +343,7 @@ const FreelancerProfiles = () => {
               maxW={'250px'}
               minW={"250px"}
               w={'full'}
-              className="bg-gray-900"
+              className="bg-gray-900  hover:scale-105 transition delay-150 duration-300 ease-in-out"
               rounded={'lg'}
               p={6}
               textAlign={'center'}>
@@ -453,7 +465,7 @@ const FAQ = () => {
   };
 
   return (<>
-    <div className="relative max-w-7xl border-b-2  border-gray-800 text-gray-100  pt-10 pb-8 mt-8 shadow-xl ring-1 ring-gray-900/5 md:mx-auto sm:rounded-lg mb-8">
+    <div className="relative font-lato max-w-[1500]  text-gray-100  pt-10 pb-8 mt-8 shadow-xl ring-1 ring-gray-900/5 md:mx-auto sm:rounded-lg mb-4">
       <div className="mx-auto px-5">
         <div className="flex flex-col items-center">
           <h2 className="mt-5 text-center text-pink-600 text-5xl font-bold tracking-tight md:text-6xl">FAQ</h2>
@@ -484,43 +496,88 @@ const FAQ = () => {
 }
 
 const StaticImages = () => {
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const slides = [
+    {
+      image: '/images/singlePerson/img1.jpg',
+      text: 'Trusted globally by over 1 million businesses, small to large',
+    },
+    {
+      image: '/images/singlePerson/img2.jpg',
+      text: 'These unsolicited text messages can come from various sources',
+    },
+    {
+      image: '/images/singlePerson/img3.jpg',
+      text: 'Start scaling your business the smart way today',
+    },
+    {
+      image: '/images/singlePerson/img4.jpg',
+      text: 'Trusted globally by over 1 million businesses, small to large',
+    },
+  ];
   return (
     <div className=" text-gray-100">
       {/* Stats Section */}
-      <div className="max-w-7xl mx-auto px-2 py-10 text-left grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
+      <div className="max-w-[1424px] font-rajdhani md:font-lato mx-auto px-2 py-10 text-center lg:text-left grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="">
           <h2 className="text-5xl mb-3 font-bold text-pink-600">3 million</h2>
           <p className="text-lg">rated freelancers, covering 8,766 skills</p>
         </div>
         <div>
-          <h2 className="text-5xl mb-3 text-center font-bold text-pink-600">$150 million</h2>
+          <h2 className="text-5xl mb-3 lg:text-center font-bold text-pink-600">$150 million</h2>
           <p className="text-lg text-center">earned by freelancers, with top freelancers earning over $7,000/m</p>
         </div>
         <div>
-          <h2 className="text-5xl mb-3 text-right font-bold text-pink-600">10 minutes</h2>
-          <p className="text-lg text-right">to task a freelancer, with 90% of projects completed in 7 days</p>
+          <h2 className="text-5xl mb-3 lg:text-right font-bold text-pink-600">10 minutes</h2>
+          <p className="text-lg lg:text-right">to task a freelancer, with 90% of projects completed in 7 days</p>
         </div>
       </div>
 
       {/* Trusted Section */}
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 bg-gray-900 text-white rounded-lg overflow-hidden">
-        <div className="p-10 my-auto">
-          <h3 className="text-xl text-pink-400">Grow your business</h3>
-          <h2 className="text-7xl font-bold mt-2">Trusted globally by over 1 million businesses, small to large</h2>
-          <button className="mt-8 px-6 py-4 bg-pink-600 text-white ">START NOW FOR FREE</button>
+      <div className="max-w-7xl font-spectral lg:mx-auto mx-4 bg-gray-900 text-white rounded-lg overflow-hidden">
+      <div className="grid-cols-2 w-full md:grid lg:grid-cols-2 gap-4">
+        {/* Swiper on the image only */}
+        <div className="p-3 md:px-4 md:py-6 md:pl-12 lg:py-16 h-[300px] md:h-auto">
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay, EffectCube]}
+            navigation
+            effect="cube"
+            speed={1000}
+            cubeEffect={{
+              shadow: true,
+              slideShadows: true,
+              shadowOffset: 20,
+              shadowScale: 0.94,
+            }}
+            pagination={{ clickable: true }}
+            slidesPerView={1}
+            autoplay={{ delay: 4100, disableOnInteraction: false }}
+            loop={true}
+            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+          >
+            {slides.map((slide, index) => (
+              <SwiperSlide key={index}>
+                <img
+                  src={slide.image}
+                  alt={`Slide ${index + 1}`}
+                  className="w-full h-[300px] md:h-[650px] rounded-lg object-cover"
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
-        <div>
-          <img src="/images/promo-business--desktop.webp" alt="Business Woman" className="w-full h-full object-cover" />
+
+        <div className="p-6 flex flex-col mt-6  md:mt-12 md:p-10 my-auto min-h-full">
+          <h3 className="text-2xl text-pink-400">Grow your business</h3>
+          <p className="text-4xl lg:text-7xl text-gray-200 font-bold mt-2 mb-4 animate-fadeInOut">
+            {slides[activeIndex].text}
+          </p>
+          <button className="mt-auto mb-2 lg:mb-40 px-4 py-2 md:px-6 md:py-4 bg-pink-600 text-white">
+            START NOW FOR FREE
+          </button>
         </div>
       </div>
-
-      {/* Brands Section */}
-      <div className="max-w-6xl mx-auto py-8 flex flex-wrap justify-center gap-6">
-        {['BBC', 'BUSINESS INSIDER', 'CNBC', 'FT', 'Forbes', 'The Independent'].map((brand, index) => (
-          <span key={index} className="text-lg font-semibold uppercase">{brand}</span>
-        ))}
-      </div>
-
+    </div>
      
     </div>
   );
@@ -530,35 +587,37 @@ const StaticImages = () => {
 const StaticFeatures = () => {
   const Feature = ({ title, description }) => {
     return (
-      <div className="flex w-1/3 items-start ">
-       
+
+      <div className="flex w-1/2 font-lato md:w-1/3 items-start">
+
         <div>
-          <h3 className="font-semibold text-md mb-2 text-pink-600">{title}</h3>
-          <p className="text-gray-200 text-xs">{description}</p>
+
+          <h3 className="font-semibold text-md md:text-xl mb-2 text-pink-600"><TbRosetteDiscountCheck className="text-pink-600  inline  mr-2 text-2xl" />{title}</h3>
+          <p className="text-gray-200  hidden md:block text-xs">{description}</p>
         </div>
       </div>
     );
   };
   return (<>
-  <div className="bg-black min-h-screen flex items-center justify-center p-6">
-      <div className="bg-gray-900 p-10 px-20 w-full rounded-xl max-w-7xl flex flex-col md:flex-row items-center gap-10 shadow-lg ">
+    <div className="bg-black flex  font-rajdhani items-center justify-center p-2">
+      <div className="bg-black md:bg-gray-900 mt-10  p-6 md:mx-16 md:px-20 text-center w-full rounded-xl  flex flex-col md:flex-row items-center gap-10 shadow-lg ">
         {/* Left Side */}
         <div className="flex-1">
-          <h1 className="text-5xl font-semibold text-gray-100">
+          <h1 className="text-4xl text-center font-spectral  md:text-6xl font-semibold text-gray-100">
             The <span className="text-pink-600">premium</span> freelance solution for businesses
           </h1>
-          <div className="mt-12 items-center gap-x-20 gap-y-10 flex flex-wrap ">
+          <div className="mt-12 items-center justify-center text-center gap-x-0 gap-y-4 md:gap-x-20 md:gap-y-10 flex flex-wrap ">
             <Feature title="Dedicated hiring experts" description="Count on an account manager to find you the right talent and see to your project’s every need." />
             <Feature title="Satisfaction guarantee" description="Order confidently, with guaranteed refunds for less-than-satisfactory deliveries." />
             <Feature title="Advanced management tools" description="Seamlessly integrate freelancers into your team and projects." />
             <Feature title="Flexible payment models" description="Pay per project or opt for hourly rates to facilitate longer-term collaboration." />
           </div>
-          <button className="mt-10 px-6 py-3 bg-pink-600 text-white rounded-lg shadow-md hover:bg-gray-800 transition">
+          <button className="mt-12 px-12 py-3 font-lato  bg-pink-600 text-white rounded-lg shadow-md hover:bg-gray-800 transition">
             Try Now
           </button>
         </div>
         {/* Right Side */}
-        <div className="flex-1 relative">
+        <div className=" hidden md:block flex-1 relative">
           <img
             src="/images/promo-business--desktop.webp"
             alt="Fiverr Pro"
@@ -572,5 +631,98 @@ const StaticFeatures = () => {
         </div>
       </div>
     </div>
+    {/* Brands Section */}
+    <div className="bg-black pb-6 my-8  md:flex items-center justify-center">
+        <div className="md:flex  gap-16 my-10 items-center text-gray-400 text-2xl">
+
+          <div className="text-center mb-4 md:mb-0">
+            <span className="text-3xl font-spectral text-white">As used by</span>
+          </div>
+          <div className="flex flex-wrap gap-8 md:gap-24  justify-center  items-center p-4 text-4xl md:text-6xl">
+            <SiAdobe className="hover:scale-125 hover:text-pink-600 transition delay-100 duration-300 ease-in-out" />
+            <FaFacebookF className="hover:scale-125 hover:text-pink-600 transition delay-100 duration-300 ease-in-out" />
+            <SiAmazon className="hover:scale-125 hover:text-pink-600 transition delay-100 duration-300 ease-in-out" />
+            <SiApple className="hover:scale-125 hover:text-pink-600 transition delay-100 duration-300 ease-in-out" />
+            <SiOracle className="hover:scale-125 hover:text-pink-600 transition delay-100 duration-300 ease-in-out" />
+
+            <FaAirbnb className="hover:scale-125 hover:text-pink-600 transition delay-100 duration-300 ease-in-out" />
+
+            <SiFujitsu className="hover:scale-125 hover:text-pink-600 transition delay-100 duration-300 ease-in-out" />
+            <FaGoogle className="hover:scale-125 hover:text-pink-600 transition delay-100 duration-300 ease-in-out" /></div>
+
+        </div>
+      </div>
   </>)
 }
+
+
+const Testimonials = () => {
+  
+const testimonials = [
+  {
+    id: 1,
+    name: 'Holden Caulfield',
+    role: 'UI DEVELOPER',
+    text: `Synth chartreuse iPhone lomo cray raw denim brunch everyday carry neutra before they sold out fixie
+           90's microdosing. Tacos pinterest fanny pack venmo, post-ironic heirloom try-hard pabst authentic iceland.`,
+    image: 'https://dummyimage.com/106x106',
+  },
+  {
+    id: 2,
+    name: 'Alper Kamu',
+    role: 'DESIGNER',
+    text: `Synth chartreuse iPhone lomo cray raw denim brunch everyday carry neutra before they sold out fixie
+           90's microdosing. Tacos pinterest fanny pack venmo, post-ironic heirloom try-hard pabst authentic iceland.`,
+    image: 'https://dummyimage.com/107x107',
+  },
+  {
+    id: 3,
+    name: 'Alper Kamu',
+    role: 'DESIGNER',
+    text: `Synth chartreuse iPhone lomo cray raw denim brunch everyday carry neutra before they sold out fixie
+           90's microdosing. Tacos pinterest fanny pack venmo, post-ironic heirloom try-hard pabst authentic iceland.`,
+    image: 'https://dummyimage.com/107x107',
+  },
+  {
+    id: 4,
+    name: 'Alper Kamu',
+    role: 'DESIGNER',
+    text: `Synth chartreuse iPhone lomo cray raw denim brunch everyday carry neutra before they sold out fixie
+           90's microdosing. Tacos pinterest fanny pack venmo, post-ironic heirloom try-hard pabst authentic iceland.`,
+    image: 'https://dummyimage.com/107x107',
+  },
+  // Add more testimonials as needed
+];
+
+  return (
+    <section className="bg-black font-rajdhani text-gray-200  md:mx-16 body-font">
+      <div className="container px-5 py-24 mx-auto">
+        <h1 className="text-6xl font-medium title-font text-pink-600 mb-12 text-center">
+          Testimonials
+        </h1>
+        <div className="flex flex-wrap -m-4">
+          {testimonials.map(({ id, name, role, text, image }) => (
+            <div key={id} className="p-2 md:p-4 md:w-1/3 w-full">
+              <div className="h-full bg-gray-900 p-8 rounded">
+                <FaQuoteLeft className="text-pink-400 text-xl mb-4" />
+                <p className="leading-relaxed mb-6">{text}</p>
+                <div className="inline-flex items-center">
+                  <img
+                    alt={name}
+                    src={image}
+                    className="w-12 h-12 rounded-full flex-shrink-0 object-cover object-center"
+                  />
+                  <span className="flex-grow flex flex-col pl-4">
+                    <span className="title-font font-medium text-gray-900">{name}</span>
+                    <span className="text-gray-500 text-sm">{role}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
